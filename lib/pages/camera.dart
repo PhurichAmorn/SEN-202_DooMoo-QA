@@ -1,0 +1,159 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:DooMoo/pages/details.dart';
+import 'package:DooMoo/utils/camera_metadata.dart';
+import 'package:DooMoo/services/yolo_detector.dart';
+import 'package:DooMoo/models/detection_result.dart';
+
+class CameraPage extends StatefulWidget {
+  const CameraPage({super.key});
+
+  @override
+  State<CameraPage> createState() => _CameraState();
+}
+
+class _CameraState extends State<CameraPage> {
+  final ImagePicker _picker = ImagePicker();
+  bool _isProcessing = false;
+  String _processingStatus = 'กำลังเตรียมการ...';
+
+  @override
+  void initState() {
+    super.initState();
+    _takePhoto();
+  }
+
+  Future<void> _takePhoto() async {
+    try {
+      final XFile? xfile = await _picker.pickImage(
+        source: ImageSource.camera,
+        maxWidth: 2048,
+        imageQuality: 90,
+      );
+      if (!mounted) return;
+
+      if (xfile == null) {
+        Navigator.of(context).pop();
+        return;
+      }
+
+      setState(() {
+        _isProcessing = true;
+        _processingStatus = 'กำลังตรวจหาหมู...';
+      });
+
+      // 1. Extract camera metadata
+      final metadata =
+          await CameraMetadataExtractor.extractFromImage(xfile.path);
+
+      // 2. Run YOLOv8 for initial object detection
+      final yolo = await YoloDetector.getInstance();
+      final detections = await yolo.detect(xfile.path);
+
+      if (detections.isEmpty) {
+        setState(() {
+          _isProcessing = false;
+        });
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('ไม่พบหมูในภาพ')),
+          );
+          Navigator.of(context).pop();
+        }
+        return;
+      }
+
+      final detectionResult = DetectionResult(
+        detections: detections,
+        imageWidth: metadata.imageWidth ?? 0,
+        imageHeight: metadata.imageHeight ?? 0,
+      );
+
+      if (!mounted) return;
+
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (_) => DetailsPage(
+            imagePath: xfile.path,
+            cameraMetadata: metadata,
+            detectionResult: detectionResult,
+          ),
+        ),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error: $e')),
+      );
+      Navigator.of(context).pop();
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.transparent,
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+        ),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.only(left: 31, top: 192),
+        child: Container(
+          width: 351,
+          height: 248,
+          decoration: BoxDecoration(
+            color: const Color(0xFFFCFCFC),
+            borderRadius: BorderRadius.circular(20),
+            boxShadow: const [
+              BoxShadow(
+                color: Color.fromARGB(20, 0, 0, 0),
+                blurRadius: 4,
+                spreadRadius: 1,
+                offset: Offset(0, 2),
+              )
+            ],
+          ),
+          child: Stack(
+            children: [
+              Align(
+                alignment: Alignment.topCenter,
+                child: Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(top: 30),
+                      child: SvgPicture.asset(
+                        'assets/icons/Camera.svg',
+                        width: 77,
+                        height: 77,
+                      ),
+                    ),
+                    if (_isProcessing) ...[
+                      const SizedBox(height: 20),
+                      const CircularProgressIndicator(),
+                      const SizedBox(height: 10),
+                      Text(
+                        _processingStatus,
+                        style: const TextStyle(
+                          fontSize: 16,
+                          color: Color(0xFF5A5A5A),
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
