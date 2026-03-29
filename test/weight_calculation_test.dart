@@ -102,8 +102,7 @@ void main() {
             abdominalWidthMm: c['abd'] as double?,
             hipWidthMm: c['hip'] as double?);
 
-        expect(result, c['expected'],
-            reason: 'Failed for inputs: $c');
+        expect(result, c['expected'], reason: 'Failed for inputs: $c');
       }
     });
 

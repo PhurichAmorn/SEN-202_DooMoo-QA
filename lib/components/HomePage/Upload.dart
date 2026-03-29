@@ -150,6 +150,7 @@ class _UploadState extends State<Upload> {
     return Padding(
         padding: const EdgeInsets.only(top: 8),
         child: GestureDetector(
+          key: const Key('home_upload_button'),
           onTap: _isProcessing ? null : _handleUpload,
           child: Container(
             width: ResponsiveUtils.width(context, 60),

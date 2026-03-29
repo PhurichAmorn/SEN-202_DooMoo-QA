@@ -52,6 +52,7 @@ class Camera extends StatelessWidget {
     return Padding(
         padding: const EdgeInsets.only(top: 8),
         child: GestureDetector(
+          key: const Key('home_camera_button'),
           onTap: isDisabled
               ? null
               : () {
