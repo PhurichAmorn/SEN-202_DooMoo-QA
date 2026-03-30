@@ -70,3 +70,9 @@ coverage/
 
 # Large Model Files (GitHub 100MB limit)
 assets/models/*.onnx
+
+# Local agent config & skills
+.agent/
+
+# Local assessment reference doc
+Assessment.md

@@ -1,9 +1,9 @@
-import 'package:DooMoo/components/DetailsPage/PigInfo.dart';
-import 'package:DooMoo/components/DetailsPage/CameraMetadataInfo.dart';
+import 'package:DooMoo/components/DetailsPage/pig_info.dart';
+import 'package:DooMoo/components/DetailsPage/camera_metadata_info.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:DooMoo/pages/home.dart';
-import 'package:DooMoo/components/DetailsPage/PigImageWithOverlay.dart';
+import 'package:DooMoo/components/DetailsPage/pig_image_with_overlay.dart';
 import 'package:DooMoo/utils/responsive.dart';
 import 'package:DooMoo/utils/camera_metadata.dart';
 import 'package:DooMoo/models/detection_result.dart';

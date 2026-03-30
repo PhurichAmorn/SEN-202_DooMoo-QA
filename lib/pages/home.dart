@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:DooMoo/components/HomePage/Camera.dart';
-import 'package:DooMoo/components/HomePage/Upload.dart';
+import 'package:DooMoo/components/HomePage/camera.dart';
+import 'package:DooMoo/components/HomePage/upload.dart';
 import 'package:DooMoo/utils/responsive.dart';
 
 class HomePage extends StatefulWidget {
