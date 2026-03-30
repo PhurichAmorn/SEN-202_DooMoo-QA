@@ -53,8 +53,8 @@ class _UploadState extends State<Upload> {
         );
 
         // Debug: Print metadata (you can remove this later)
-        print('Camera Metadata: $metadata');
-        print('Detection Result: $detectionResult');
+        debugPrint('Camera Metadata: $metadata');
+        debugPrint('Detection Result: $detectionResult');
 
         if (!mounted) return;
         _setProcessing(false);
@@ -69,7 +69,7 @@ class _UploadState extends State<Upload> {
           ),
         );
       } catch (e) {
-        print('Upload/Detection Error: $e');
+        debugPrint('Upload/Detection Error: $e');
         if (mounted) {
           _setProcessing(false);
           ScaffoldMessenger.of(context).showSnackBar(

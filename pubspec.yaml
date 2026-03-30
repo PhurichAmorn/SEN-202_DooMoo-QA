@@ -77,8 +77,9 @@ flutter:
     - assets/icons/Upload.svg
     - assets/icons/ArrowLeftBlack.svg
     - assets/icons/application-icon.png
-    - assets/models/rf_detr_pig.onnx
-    - assets/models/yolov8_pig.onnx
+    # Model files - add these back once the ONNX files are placed in assets/models/
+    # - assets/models/rf_detr_pig.onnx
+    # - assets/models/yolov8_pig.onnx
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

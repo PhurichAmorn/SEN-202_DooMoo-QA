@@ -1,6 +1,6 @@
 import 'dart:io';
 import 'dart:convert';
-import 'dart:typed_data';
+import 'package:flutter/foundation.dart';
 import 'dart:ui' as ui;
 import 'package:exif/exif.dart';
 import 'package:flutter/services.dart';
@@ -84,7 +84,7 @@ class CameraMetadataExtractor {
     try {
       bytes = await file.readAsBytes();
     } catch (e) {
-      print('Error reading file: $e');
+      debugPrint('Error reading file: $e');
       return await _getHardwareMetadata();
     }
 
@@ -98,7 +98,7 @@ class CameraMetadataExtractor {
       imageHeight = decodedImage.height;
       decodedImage.dispose();
     } catch (e) {
-      print('Could not decode image for dimensions: $e');
+      debugPrint('Could not decode image for dimensions: $e');
     }
 
     // SECONDARY: Try to extract additional metadata from EXIF data
@@ -112,7 +112,7 @@ class CameraMetadataExtractor {
             focalLength = _parseRational(data['EXIF FocalLength']);
           }
         } catch (e) {
-          print('Error extracting focal length: $e');
+          debugPrint('Error extracting focal length: $e');
         }
 
         // Extract f-number (aperture)
@@ -121,7 +121,7 @@ class CameraMetadataExtractor {
             fNumber = _parseRational(data['EXIF FNumber']);
           }
         } catch (e) {
-          print('Error extracting f-number: $e');
+          debugPrint('Error extracting f-number: $e');
         }
 
         // Extract ISO
@@ -136,7 +136,7 @@ class CameraMetadataExtractor {
             }
           }
         } catch (e) {
-          print('Error extracting ISO: $e');
+          debugPrint('Error extracting ISO: $e');
         }
 
         // If dart:ui decoding failed, try EXIF dimension tags as fallback
@@ -153,12 +153,12 @@ class CameraMetadataExtractor {
               'EXIF PixelYDimension',
             ]);
           } catch (e) {
-            print('Error extracting dimensions from EXIF: $e');
+            debugPrint('Error extracting dimensions from EXIF: $e');
           }
         }
       }
     } catch (e) {
-      print('Error reading EXIF data: $e');
+      debugPrint('Error reading EXIF data: $e');
     }
 
     // Get sensor dimensions from hardware
@@ -301,16 +301,16 @@ class CameraMetadataCache {
         final jsonString = await file.readAsString();
         final jsonMap = json.decode(jsonString) as Map<String, dynamic>;
         _cachedMetadata = CameraMetadata.fromJson(jsonMap);
-        print('Camera metadata loaded from cache: $_cachedMetadata');
+        debugPrint('Camera metadata loaded from cache: $_cachedMetadata');
       } else {
         // Fetch from hardware and save to cache
         _cachedMetadata = await CameraMetadataExtractor._getHardwareMetadata();
         await _saveToCache(_cachedMetadata!);
-        print(
+        debugPrint(
             'Camera metadata fetched from hardware and cached: $_cachedMetadata');
       }
     } catch (e) {
-      print('Error initializing camera metadata cache: $e');
+      debugPrint('Error initializing camera metadata cache: $e');
       // Fallback to empty metadata
       _cachedMetadata = CameraMetadata();
     }
@@ -324,7 +324,7 @@ class CameraMetadataCache {
       final jsonString = json.encode(metadata.toJson());
       await file.writeAsString(jsonString);
     } catch (e) {
-      print('Error saving camera metadata to cache: $e');
+      debugPrint('Error saving camera metadata to cache: $e');
     }
   }
 
@@ -351,7 +351,7 @@ class CameraMetadataCache {
       }
       _cachedMetadata = null;
     } catch (e) {
-      print('Error clearing camera metadata cache: $e');
+      debugPrint('Error clearing camera metadata cache: $e');
     }
   }
 }

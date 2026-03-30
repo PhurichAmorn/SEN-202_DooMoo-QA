@@ -23,14 +23,18 @@ class PigMath {
         sensorWidth == null ||
         sensorHeight == null ||
         imageWidth == null ||
-        imageHeight == null) return null;
+        imageHeight == null) {
+      return null;
+    }
 
     if (focalLength <= 0 ||
         sensorWidth <= 0 ||
         sensorHeight <= 0 ||
         imageWidth <= 0 ||
         imageHeight <= 0 ||
-        distanceMm <= 0) return null;
+        distanceMm <= 0) {
+      return null;
+    }
 
     // Average pixel size since PCA axes are not aligned to image axes
     final pixelSizeW = sensorWidth / imageWidth;
@@ -54,13 +58,17 @@ class PigMath {
     if (bodyLengthMm == null ||
         chestWidthMm == null ||
         abdominalWidthMm == null ||
-        hipWidthMm == null) return '-';
+        hipWidthMm == null) {
+      return '-';
+    }
     final weight = -21.95431 +
         0.31079 * (bodyLengthMm / 10) +
         0.43166 * (chestWidthMm / 10) +
         0.47990 * (abdominalWidthMm / 10) +
         0.42656 * (hipWidthMm / 10);
-    if (weight < 0) return '-';
+    if (weight < 0) {
+      return '-';
+    }
     return '${weight.toStringAsFixed(1)} kg';
   }
 }

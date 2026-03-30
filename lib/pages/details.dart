@@ -84,7 +84,7 @@ class _DetailsPageState extends State<DetailsPage> {
           });
         }
       } catch (e) {
-        print('Error running segmentation: $e');
+        debugPrint('Error running segmentation: $e');
       } finally {
         if (mounted) {
           setState(() {
