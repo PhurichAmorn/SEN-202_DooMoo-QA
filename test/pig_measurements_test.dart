@@ -89,5 +89,45 @@ void main() {
       expect(measurementsShift1.widthTop,
           isNot(closeTo(measurementsShift1.widthBottom, 0.001)));
     });
+    test('when the mask is a rotated rectangle', () {
+      final mask = List.generate(50, (y) => List.generate(50, (x) => 0.0));
+
+      // Create a diagonal (rotated) rectangle
+      for (int i = 10; i < 30; i++) {
+        for (int w = -3; w <= 3; w++) {
+          int x = i;
+          int y = i + w; // diagonal
+          if (x >= 0 && x < 50 && y >= 0 && y < 50) {
+            mask[y][x] = 1.0;
+          }
+        }
+      }
+
+      final boundingBox = Rect.fromLTWH(10, 10, 30, 30);
+
+      final measurements = PigMeasurements.fromMask(mask, boundingBox);
+
+      expect(measurements, isNotNull);
+
+      // Length should still be significant (diagonal line)
+      expect(measurements!.length, greaterThan(15));
+    });
+    test('mask with noise still produces stable measurement', () {
+      final mask = List.generate(
+          50,
+          (y) => List.generate(
+              50, (x) => (x >= 15 && x < 25 && y >= 15 && y < 35) ? 1.0 : 0.0));
+
+      // Add noise
+      mask[10][10] = 1.0;
+      mask[40][40] = 1.0;
+
+      final boundingBox = Rect.fromLTWH(15, 15, 10, 20);
+
+      final measurements = PigMeasurements.fromMask(mask, boundingBox);
+
+      expect(measurements, isNotNull);
+      expect(measurements!.length, closeTo(20.0, 2.0));
+    });
   });
 }

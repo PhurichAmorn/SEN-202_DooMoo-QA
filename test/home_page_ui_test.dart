@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:DooMoo/components/HomePage/Camera.dart';
 import 'package:DooMoo/components/HomePage/Upload.dart';
 import 'package:DooMoo/pages/camera.dart';
+import 'package:DooMoo/pages/home.dart';
 
 // Mock NavigatorObserver to track navigation
 class MockNavigatorObserver extends NavigatorObserver {
@@ -31,8 +32,7 @@ void main() {
 
       await tester.pumpWidget(
         MaterialApp(
-          home: Scaffold(
-              body: SingleChildScrollView(child: Center(child: child))),
+          home: Scaffold(body: child),
           navigatorObservers: observers,
         ),
       );
@@ -79,15 +79,62 @@ void main() {
       expect(tester.takeException(), isNull);
     });
 
+    testWidgets('Camera button should be disabled when Upload is processing',
+        (WidgetTester tester) async {
+      // We use the real HomePage which coordinates the state between Camera and Upload
+      // Set a large enough surface size for the whole page
+      tester.view.physicalSize = const Size(400 * 3, 2000 * 3);
+      tester.view.devicePixelRatio = 3.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      final mockObserver = MockNavigatorObserver();
+      await tester.pumpWidget(
+        MaterialApp(
+          home: const HomePage(),
+          navigatorObservers: [mockObserver],
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      // Find both widgets
+      final cameraFinder = find.byType(Camera);
+      final uploadFinder = find.byType(Upload);
+
+      // 1. Initially enabled
+      Camera cameraWidget = tester.widget(cameraFinder);
+      expect(cameraWidget.isDisabled, isFalse);
+
+      // 2. Trigger processing state manually via the widget's callback
+      final Upload uploadWidget = tester.widget(uploadFinder);
+      uploadWidget.onProcessingChanged!(true);
+      await tester.pump(); // Rebuild with new state
+
+      // 3. Verify Camera widget is now disabled in the UI
+      cameraWidget = tester.widget(cameraFinder);
+      expect(cameraWidget.isDisabled, isTrue);
+
+      // 4. Try to tap the camera button while disabled
+      final cameraButtonKeyFinder = find.byKey(const Key('home_camera_button'));
+      await tester.tap(cameraButtonKeyFinder);
+      await tester.pumpAndSettle();
+
+      // 5. Assert: No navigation should have occurred (only the initial route exists)
+      expect(mockObserver.pushedRoutes.length, 1);
+      expect(find.byType(CameraPage), findsNothing);
+    });
+
     testWidgets('Home widgets render without crashing',
         (WidgetTester tester) async {
       await setupTest(
         tester,
-        const Column(
-          children: [
-            Camera(),
-            Upload(),
-          ],
+        const SingleChildScrollView(
+          child: Column(
+            children: [
+              Camera(),
+              Upload(),
+            ],
+          ),
         ),
       );
 
