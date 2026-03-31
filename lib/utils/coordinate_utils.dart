@@ -1,5 +1,4 @@
 import 'dart:ui';
-import 'dart:math';
 
 class CoordinateUtils {
   /// Maps YOLO normalized output coordinates to original image pixels.
