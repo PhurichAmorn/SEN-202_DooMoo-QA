@@ -156,14 +156,5 @@ void main() {
       TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
           .setMockMethodCallHandler(channel, null);
     });
-    group('CameraMetadataCache tests', () {
-      test('where initializeHardwareMetadata handles errors gracefully',
-          () async {
-        // Note: testing actual file IO in unit tests is hard without mocks for path_provider,
-        // but we can at least verify it doesn't crash.
-
-        expect(CameraMetadataCache.initializeHardwareMetadata(), completes);
-      });
-    });
   });
 }

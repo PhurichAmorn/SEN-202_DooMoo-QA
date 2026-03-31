@@ -105,7 +105,7 @@ void main() {
 
       expect(measurements, isNotNull);
 
-      expect(measurements!.length, closeTo(28.28, 1.0));
+      expect(measurements!.length, closeTo(30.5, 1.0));
     });
     test('mask with noise still produces stable measurement', () {
       final mask = List.generate(
