@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:DooMoo/pages/camera.dart';
-import 'package:DooMoo/utils/responsive.dart';
+import 'package:doomoo/pages/camera.dart';
+import 'package:doomoo/utils/responsive.dart';
 
 class Camera extends StatelessWidget {
   final bool isDisabled;

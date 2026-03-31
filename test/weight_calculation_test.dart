@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:DooMoo/utils/pig_math.dart';
+import 'package:doomoo/utils/pig_math.dart';
 
 void main() {
   group('test weight regression model', () {

@@ -3,8 +3,8 @@ import 'dart:typed_data';
 import 'package:flutter/services.dart';
 import 'package:onnxruntime_v2/onnxruntime_v2.dart';
 import 'package:image/image.dart' as img;
-import 'package:DooMoo/models/detection_result.dart';
-import 'package:DooMoo/utils/coordinate_utils.dart';
+import 'package:doomoo/models/detection_result.dart';
+import 'package:doomoo/utils/coordinate_utils.dart';
 
 class YoloDetector {
   static YoloDetector? _instance;

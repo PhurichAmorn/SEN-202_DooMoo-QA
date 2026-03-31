@@ -1,6 +1,6 @@
 import 'dart:ui';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:DooMoo/utils/coordinate_utils.dart';
+import 'package:doomoo/utils/coordinate_utils.dart';
 
 void main() {
   group('test YOLO coordinate mapping', () {

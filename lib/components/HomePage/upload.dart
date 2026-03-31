@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:DooMoo/pages/details.dart';
-import 'package:DooMoo/utils/responsive.dart';
-import 'package:DooMoo/utils/camera_metadata.dart';
-import 'package:DooMoo/services/yolo_detector.dart';
-import 'package:DooMoo/models/detection_result.dart';
+import 'package:doomoo/pages/details.dart';
+import 'package:doomoo/utils/responsive.dart';
+import 'package:doomoo/utils/camera_metadata.dart';
+import 'package:doomoo/services/yolo_detector.dart';
+import 'package:doomoo/models/detection_result.dart';
 
 class Upload extends StatefulWidget {
   final ValueChanged<bool>? onProcessingChanged;

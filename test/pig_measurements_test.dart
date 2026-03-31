@@ -1,6 +1,6 @@
 import 'dart:ui';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:DooMoo/utils/pig_measurements.dart';
+import 'package:doomoo/utils/pig_measurements.dart';
 
 void main() {
   group('test PCA measurements', () {

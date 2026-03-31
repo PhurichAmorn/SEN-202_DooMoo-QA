@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:DooMoo/components/HomePage/camera.dart';
-import 'package:DooMoo/components/HomePage/upload.dart';
-import 'package:DooMoo/pages/camera.dart';
-import 'package:DooMoo/pages/home.dart';
+import 'package:doomoo/components/HomePage/camera.dart';
+import 'package:doomoo/components/HomePage/upload.dart';
+import 'package:doomoo/pages/camera.dart';
+import 'package:doomoo/pages/home.dart';
 
 // Mock NavigatorObserver to track navigation
 class MockNavigatorObserver extends NavigatorObserver {

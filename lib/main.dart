@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:DooMoo/pages/home.dart';
-import 'package:DooMoo/utils/camera_metadata.dart';
-import 'package:DooMoo/services/pig_detector.dart';
-import 'package:DooMoo/services/yolo_detector.dart';
+import 'package:doomoo/pages/home.dart';
+import 'package:doomoo/utils/camera_metadata.dart';
+import 'package:doomoo/services/pig_detector.dart';
+import 'package:doomoo/services/yolo_detector.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

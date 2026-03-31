@@ -1,14 +1,14 @@
-import 'package:DooMoo/components/DetailsPage/pig_info.dart';
-import 'package:DooMoo/components/DetailsPage/camera_metadata_info.dart';
+import 'package:doomoo/components/DetailsPage/pig_info.dart';
+import 'package:doomoo/components/DetailsPage/camera_metadata_info.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:DooMoo/pages/home.dart';
-import 'package:DooMoo/components/DetailsPage/pig_image_with_overlay.dart';
-import 'package:DooMoo/utils/responsive.dart';
-import 'package:DooMoo/utils/camera_metadata.dart';
-import 'package:DooMoo/models/detection_result.dart';
-import 'package:DooMoo/utils/config.dart';
-import 'package:DooMoo/services/pig_detector.dart';
+import 'package:doomoo/pages/home.dart';
+import 'package:doomoo/components/DetailsPage/pig_image_with_overlay.dart';
+import 'package:doomoo/utils/responsive.dart';
+import 'package:doomoo/utils/camera_metadata.dart';
+import 'package:doomoo/models/detection_result.dart';
+import 'package:doomoo/utils/config.dart';
+import 'package:doomoo/services/pig_detector.dart';
 
 class DetailsPage extends StatefulWidget {
   final String? imagePath;

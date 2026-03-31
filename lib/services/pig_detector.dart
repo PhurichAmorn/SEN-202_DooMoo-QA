@@ -2,8 +2,8 @@ import 'dart:math' as math;
 import 'dart:typed_data';
 import 'package:flutter/services.dart';
 import 'package:onnxruntime_v2/onnxruntime_v2.dart';
-import 'package:DooMoo/models/detection_result.dart';
-import 'package:DooMoo/utils/image_preprocessing.dart';
+import 'package:doomoo/models/detection_result.dart';
+import 'package:doomoo/utils/image_preprocessing.dart';
 
 /// Singleton service for running RF-DETR pig segmentation inference on-device.
 class PigDetector {

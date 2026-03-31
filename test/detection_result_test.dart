@@ -1,6 +1,6 @@
 import 'dart:ui';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:DooMoo/models/detection_result.dart';
+import 'package:doomoo/models/detection_result.dart';
 
 void main() {
   group('test pig detection model and detection result', () {

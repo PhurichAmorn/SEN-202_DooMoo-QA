@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:DooMoo/utils/camera_metadata.dart';
+import 'package:doomoo/utils/camera_metadata.dart';
 
 void main() {
   group('CameraMetadata Model Tests', () {

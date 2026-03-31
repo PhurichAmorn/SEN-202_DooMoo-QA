@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:DooMoo/utils/responsive.dart';
-import 'package:DooMoo/models/detection_result.dart';
-import 'package:DooMoo/utils/camera_metadata.dart';
-import 'package:DooMoo/utils/pig_measurements.dart';
-import 'package:DooMoo/utils/config.dart';
-import 'package:DooMoo/utils/pig_math.dart';
+import 'package:doomoo/utils/responsive.dart';
+import 'package:doomoo/models/detection_result.dart';
+import 'package:doomoo/utils/camera_metadata.dart';
+import 'package:doomoo/utils/pig_measurements.dart';
+import 'package:doomoo/utils/config.dart';
+import 'package:doomoo/utils/pig_math.dart';
 
 class PigInfo extends StatefulWidget {
   final DetectionResult? detectionResult;
