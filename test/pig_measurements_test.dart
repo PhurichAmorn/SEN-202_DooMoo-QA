@@ -17,9 +17,6 @@ void main() {
       );
 
       expect(measurements, isNotNull);
-      // The mask is 10 wide and 20 high.
-      // Since it's a vertical rectangle, length should be ~20.
-      // Widths should be ~10.
       expect(measurements!.length, closeTo(19.0, 1.0));
       expect(measurements.widthTop, closeTo(9.0, 1.0));
       expect(measurements.widthMiddle, closeTo(9.0, 1.0));
@@ -85,7 +82,6 @@ void main() {
       expect(measurementsShift1.widthBottom,
           isNot(closeTo(measurementsShift2.widthBottom, 0.001)));
 
-      // Top and Bottom should be different for a trapezoid
       expect(measurementsShift1.widthTop,
           isNot(closeTo(measurementsShift1.widthBottom, 0.001)));
     });
@@ -109,8 +105,7 @@ void main() {
 
       expect(measurements, isNotNull);
 
-      // Length should still be significant (diagonal line)
-      expect(measurements!.length, greaterThan(15));
+      expect(measurements!.length, closeTo(28.28, 1.0));
     });
     test('mask with noise still produces stable measurement', () {
       final mask = List.generate(
