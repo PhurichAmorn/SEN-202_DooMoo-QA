@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:onnxruntime_v2/onnxruntime_v2.dart';
 import 'package:image/image.dart' as img;
 import 'package:DooMoo/models/detection_result.dart';
+import 'package:DooMoo/utils/coordinate_utils.dart';
 
 class YoloDetector {
   static YoloDetector? _instance;
@@ -129,18 +130,18 @@ class YoloDetector {
       final score = output[4][i];
       if (score < _confidenceThreshold) continue;
 
-      final cx = output[0][i] * imgW / _inputSize;
-      final cy = output[1][i] * imgH / _inputSize;
-      final w = output[2][i] * imgW / _inputSize;
-      final h = output[3][i] * imgH / _inputSize;
-
-      final left = (cx - w / 2).clamp(0.0, imgW.toDouble());
-      final top = (cy - h / 2).clamp(0.0, imgH.toDouble());
-      final right = (cx + w / 2).clamp(0.0, imgW.toDouble());
-      final bottom = (cy + h / 2).clamp(0.0, imgH.toDouble());
+      final rect = CoordinateUtils.mapYoloToImagePixels(
+        cx: output[0][i],
+        cy: output[1][i],
+        w: output[2][i],
+        h: output[3][i],
+        inputSize: _inputSize,
+        imgW: imgW,
+        imgH: imgH,
+      );
 
       candidates.add(PigDetection(
-        boundingBox: Rect.fromLTRB(left, top, right, bottom),
+        boundingBox: rect,
         confidence: score,
         classId: 0,
       ));
