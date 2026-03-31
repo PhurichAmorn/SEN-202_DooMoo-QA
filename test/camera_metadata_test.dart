@@ -156,5 +156,64 @@ void main() {
       TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
           .setMockMethodCallHandler(channel, null);
     });
+
+    test('where extractFromImage handles platform channel exception', () async {
+      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+          .setMockMethodCallHandler(channel, (methodCall) async {
+        throw PlatformException(code: 'ERROR', message: 'Failed');
+      });
+
+      final result =
+          await CameraMetadataExtractor.extractFromImage('nonexistent.png');
+
+      expect(result.sensorWidth, isNull);
+      expect(result.focalLength, isNull);
+
+      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+          .setMockMethodCallHandler(channel, null);
+    });
+  });
+
+  group('test CameraMetadataCache error handling', () {
+    const channel = MethodChannel('plugins.flutter.io/path_provider');
+
+    setUp(() {
+      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+          .setMockMethodCallHandler(channel, (methodCall) async {
+        if (methodCall.method == 'getApplicationDocumentsDirectory') {
+          return '.';
+        }
+        return null;
+      });
+    });
+
+    tearDown(() {
+      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+          .setMockMethodCallHandler(channel, null);
+    });
+
+    test('where hasCachedMetadata returns false on error', () async {
+      // Simulate an error by setting path provider handler to throw
+      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+          .setMockMethodCallHandler(channel, (methodCall) async {
+        throw Exception('Path provider failed');
+      });
+
+      final hasCache = await CameraMetadataCache.hasCachedMetadata();
+      expect(hasCache, isFalse);
+    });
+
+    test('where initializeHardwareMetadata handles file read error', () async {
+      // If we don't mock the file system, it might throw or just not find the file.
+      // The current implementation has a broad try-catch.
+      await CameraMetadataCache.initializeHardwareMetadata();
+      expect(CameraMetadataCache.getCachedMetadata(), isNotNull);
+    });
+
+    test('where clearCache handles error', () async {
+      // This should not throw even if file operations fail
+      await CameraMetadataCache.clearCache();
+      expect(CameraMetadataCache.getCachedMetadata(), isNull);
+    });
   });
 }

@@ -23,7 +23,6 @@ void main() {
       Widget child, {
       List<NavigatorObserver> observers = const [],
     }) async {
-      // Simulate realistic screen size to satisfy ResponsiveUtils and prevent overflows
       tester.view.physicalSize = const Size(400 * 3, 2000 * 3);
       tester.view.devicePixelRatio = 3.0;
 
@@ -79,7 +78,7 @@ void main() {
       expect(tester.takeException(), isNull);
     });
 
-    testWidgets('Camera button should be disabled when Upload is processing',
+    testWidgets('where pressing upload will disable Camera button',
         (WidgetTester tester) async {
       // We use the real HomePage which coordinates the state between Camera and Upload
       // Set a large enough surface size for the whole page
@@ -101,30 +100,30 @@ void main() {
       final cameraFinder = find.byType(Camera);
       final uploadFinder = find.byType(Upload);
 
-      // 1. Initially enabled
+      // Test Initially enabled
       Camera cameraWidget = tester.widget(cameraFinder);
       expect(cameraWidget.isDisabled, isFalse);
 
-      // 2. Trigger processing state manually via the widget's callback
+      // Trigger processing state manually via the widget's callback
       final Upload uploadWidget = tester.widget(uploadFinder);
       uploadWidget.onProcessingChanged!(true);
       await tester.pump(); // Rebuild with new state
 
-      // 3. Verify Camera widget is now disabled in the UI
+      // Verify Camera widget is now disabled in the UI
       cameraWidget = tester.widget(cameraFinder);
       expect(cameraWidget.isDisabled, isTrue);
 
-      // 4. Try to tap the camera button while disabled
+      // Try to tap the camera button while disabled
       final cameraButtonKeyFinder = find.byKey(const Key('home_camera_button'));
       await tester.tap(cameraButtonKeyFinder);
       await tester.pumpAndSettle();
 
-      // 5. Assert: No navigation should have occurred (only the initial route exists)
+      //Assert: No navigation should have occurred (only the initial route exists)
       expect(mockObserver.pushedRoutes.length, 1);
       expect(find.byType(CameraPage), findsNothing);
     });
 
-    testWidgets('Home widgets render without crashing',
+    testWidgets('where Home widgets render without crashing',
         (WidgetTester tester) async {
       await setupTest(
         tester,
@@ -143,3 +142,5 @@ void main() {
     });
   });
 }
+
+// Note: The above test is not a complete test for UI testing, please use your own test for the UI testing assessment. This code will be part of   SEN-202:00030 Create and execute functional tests
