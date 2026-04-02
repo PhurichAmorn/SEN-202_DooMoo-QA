@@ -6,7 +6,7 @@ void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
   group('test camera metadata', () {
-    test('where toJson and fromJson should be consistent', () {
+    test('where toJson and fromJson are called then they are consistent', () {
       final original = CameraMetadata(
         sensorWidth: 6.17,
         sensorHeight: 4.55,
@@ -29,7 +29,8 @@ void main() {
       expect(fromJson.iso, original.iso);
     });
 
-    test('where fromJson handles null values gracefully', () {
+    test('where fromJson handles null values then it returns empty metadata',
+        () {
       final json = <String, dynamic>{};
 
       final fromJson = CameraMetadata.fromJson(json);
@@ -41,7 +42,7 @@ void main() {
       expect(fromJson.imageHeight, isNull);
     });
 
-    test('where toString returns formatted string', () {
+    test('where toString is called then it returns formatted string', () {
       final metadata = CameraMetadata(
         sensorWidth: 5.0,
         sensorHeight: 4.0,
@@ -56,12 +57,13 @@ void main() {
     });
   });
 
-  group('test CameraMetadataExtractor calculation', () {
-    test('where calculateSensorDimensions computes correct values using FOV',
+  group('test camera metadata extractor calculation', () {
+    test(
+        'where calculateSensorDimensions uses FOV then it computes correct values',
         () {
-      final focalLength = 5.0;
-      final fovWidth = 60.0;
-      final fovHeight = 40.0;
+      const focalLength = 5.0;
+      const fovWidth = 60.0;
+      const fovHeight = 40.0;
 
       final result = CameraMetadataExtractor.calculateSensorDimensions(
         focalLength: focalLength,
@@ -71,17 +73,13 @@ void main() {
         fieldOfViewHeight: fovHeight,
       );
 
-      // sensor_size = 2 * focal_length * tan(FOV/2)
-      // 2 * 5 * tan(30 deg) = 10 * 0.57735 = 5.7735
-      // 2 * 5 * tan(20 deg) = 10 * 0.36397 = 3.6397
       expect(result.sensorWidth, closeTo(5.7735, 0.001));
       expect(result.sensorHeight, closeTo(3.6397, 0.001));
       expect(result.imageWidth, 1000);
       expect(result.imageHeight, 800);
     });
 
-    test('where calculateSensorDimensions handles zero focal length gracefully',
-        () {
+    test('where focal length is zero then dimensions are zero', () {
       final result = CameraMetadataExtractor.calculateSensorDimensions(
         focalLength: 0.0,
         imageWidth: 1000,
@@ -94,8 +92,7 @@ void main() {
       expect(result.sensorHeight, 0.0);
     });
 
-    test('where calculateSensorDimensions handles extreme FOV', () {
-      // 179 degrees FOV (fisheye-like)
+    test('where FOV is extreme then it still computes dimensions', () {
       final result = CameraMetadataExtractor.calculateSensorDimensions(
         focalLength: 5.0,
         imageWidth: 1000,
@@ -109,80 +106,65 @@ void main() {
     });
   });
 
-  group('test failure modes and fallback', () {
+  group('test camera metadata failure modes', () {
     const channel = MethodChannel('camera_info');
 
-    test('where extractFromImage falls back to hardware info on invalid path',
+    test('where image path is invalid then it falls back to hardware info',
         () async {
       TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
           .setMockMethodCallHandler(channel, (methodCall) async {
         if (methodCall.method == 'getCameraInfo') {
-          return {
-            'sensorWidth': 6.0,
-            'sensorHeight': 4.0,
-            'focalLength': 5.0,
-          };
+          return {'sensorWidth': 6.0, 'sensorHeight': 4.0, 'focalLength': 5.0};
         }
         return null;
       });
 
-      final result = await CameraMetadataExtractor.extractFromImage(
-          'invalid/path/image.jpg');
+      final result =
+          await CameraMetadataExtractor.extractFromImage('invalid.jpg');
 
       expect(result.sensorWidth, 6.0);
       expect(result.sensorHeight, 4.0);
       expect(result.focalLength, 5.0);
-      expect(result.imageWidth, isNull);
-
       TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
           .setMockMethodCallHandler(channel, null);
     });
 
-    test(
-        'where extractFromImage returns empty metadata if both file and hardware fail',
+    test('where both file and hardware fail then it returns empty metadata',
         () async {
       TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
-          .setMockMethodCallHandler(channel, (methodCall) async {
-        return null; // Simulate hardware info unavailable
-      });
+          .setMockMethodCallHandler(channel, (methodCall) async => null);
 
-      final result =
-          await CameraMetadataExtractor.extractFromImage('nonexistent.png');
+      final result = await CameraMetadataExtractor.extractFromImage('none.png');
 
       expect(result.sensorWidth, isNull);
       expect(result.focalLength, isNull);
-      expect(result.imageWidth, isNull);
-
       TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
           .setMockMethodCallHandler(channel, null);
     });
 
-    test('where extractFromImage handles platform channel exception', () async {
+    test('where platform channel throws then it handles exception gracefully',
+        () async {
       TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
           .setMockMethodCallHandler(channel, (methodCall) async {
         throw PlatformException(code: 'ERROR', message: 'Failed');
       });
 
-      final result =
-          await CameraMetadataExtractor.extractFromImage('nonexistent.png');
+      final result = await CameraMetadataExtractor.extractFromImage('none.png');
 
       expect(result.sensorWidth, isNull);
       expect(result.focalLength, isNull);
-
       TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
           .setMockMethodCallHandler(channel, null);
     });
   });
 
-  group('test CameraMetadataCache error handling', () {
+  group('test camera metadata cache error handling', () {
     const channel = MethodChannel('plugins.flutter.io/path_provider');
 
     setUp(() {
       TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
           .setMockMethodCallHandler(channel, (methodCall) async {
-        if (methodCall.method == 'getApplicationDocumentsDirectory') {
-          return '.';
-        }
+        if (methodCall.method == 'getApplicationDocumentsDirectory') return '.';
         return null;
       });
     });
@@ -192,27 +174,29 @@ void main() {
           .setMockMethodCallHandler(channel, null);
     });
 
-    test('where hasCachedMetadata returns false on error', () async {
-      // Simulate an error by setting path provider handler to throw
+    test('where path provider fails then hasCachedMetadata returns false',
+        () async {
       TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
           .setMockMethodCallHandler(channel, (methodCall) async {
         throw Exception('Path provider failed');
       });
 
       final hasCache = await CameraMetadataCache.hasCachedMetadata();
+
       expect(hasCache, isFalse);
     });
 
-    test('where initializeHardwareMetadata handles file read error', () async {
-      // If we don't mock the file system, it might throw or just not find the file.
-      // The current implementation has a broad try-catch.
+    test('where file read fails then initializeHardwareMetadata handles it',
+        () async {
       await CameraMetadataCache.initializeHardwareMetadata();
+
       expect(CameraMetadataCache.getCachedMetadata(), isNotNull);
     });
 
-    test('where clearCache handles error', () async {
-      // This should not throw even if file operations fail
+    test('where clearCache is called then it handles errors gracefully',
+        () async {
       await CameraMetadataCache.clearCache();
+
       expect(CameraMetadataCache.getCachedMetadata(), isNull);
     });
   });

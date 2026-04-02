@@ -70,6 +70,9 @@ class CameraMetadata {
 class CameraMetadataExtractor {
   static const MethodChannel _channel = MethodChannel('camera_info');
 
+  /// Static flag to disable platform/hardware calls during tests.
+  static bool skipHardwareInTests = false;
+
   /// Extract metadata from image file using EXIF data
   static Future<CameraMetadata> extractFromImage(String imagePath) async {
     double? focalLength;
@@ -89,7 +92,6 @@ class CameraMetadataExtractor {
     }
 
     // PRIMARY METHOD: Get image dimensions by decoding the actual image
-    // This is the most reliable way and works on all devices
     try {
       final codec = await ui.instantiateImageCodec(Uint8List.fromList(bytes));
       final frame = await codec.getNextFrame();
@@ -193,8 +195,8 @@ class CameraMetadataExtractor {
   }
 
   /// Get camera hardware metadata directly from device
-  /// This requires platform-specific implementation
   static Future<CameraMetadata> _getHardwareMetadata() async {
+    if (skipHardwareInTests) return CameraMetadata();
     try {
       final Map<String, dynamic>? cameraInfo =
           await _channel.invokeMapMethod<String, dynamic>('getCameraInfo');
@@ -208,7 +210,6 @@ class CameraMetadataExtractor {
       }
     } catch (e) {
       // Platform channel not implemented or failed
-      // Return default/unknown values
     }
 
     return CameraMetadata();
@@ -221,7 +222,6 @@ class CameraMetadataExtractor {
     if (value is IfdTag) {
       final values = value.values.toList();
       if (values.isNotEmpty) {
-        // Rational values are Ratio objects with toString() = "num/denom"
         final parts = values[0].toString().split('/');
         if (parts.length == 2) {
           final n = double.tryParse(parts[0]);
@@ -238,19 +238,16 @@ class CameraMetadataExtractor {
   }
 
   /// Calculate sensor dimensions from focal length and field of view
-  /// This is a helper method if sensor dimensions are not directly available
   static CameraMetadata calculateSensorDimensions({
     required double focalLength,
     required double imageWidth,
     required double imageHeight,
-    required double fieldOfViewWidth, // in degrees
-    required double fieldOfViewHeight, // in degrees
+    required double fieldOfViewWidth,
+    required double fieldOfViewHeight,
   }) {
-    // Convert FOV from degrees to radians
     final fovWidthRad = fieldOfViewWidth * 3.14159 / 180;
     final fovHeightRad = fieldOfViewHeight * 3.14159 / 180;
 
-    // Calculate sensor dimensions using: sensor_size = 2 * focal_length * tan(FOV/2)
     final sensorWidth = 2 * focalLength * math.tan(fovWidthRad / 2);
     final sensorHeight = 2 * focalLength * math.tan(fovHeightRad / 2);
 
@@ -265,7 +262,6 @@ class CameraMetadataExtractor {
 }
 
 /// Cache manager for camera hardware metadata
-/// Loads from file if exists, otherwise fetches from hardware and saves
 class CameraMetadataCache {
   static const String _cacheFileName = 'camera_hardware_metadata.json';
   static CameraMetadata? _cachedMetadata;
@@ -288,8 +284,11 @@ class CameraMetadataCache {
   }
 
   /// Initialize hardware metadata on first app launch
-  /// Call this in main() before runApp()
   static Future<void> initializeHardwareMetadata() async {
+    if (CameraMetadataExtractor.skipHardwareInTests) {
+      _cachedMetadata = CameraMetadata();
+      return;
+    }
     if (_cachedMetadata != null) return;
 
     try {
@@ -297,13 +296,11 @@ class CameraMetadataCache {
       final file = File(filePath);
 
       if (await file.exists()) {
-        // Load from cache file
         final jsonString = await file.readAsString();
         final jsonMap = json.decode(jsonString) as Map<String, dynamic>;
         _cachedMetadata = CameraMetadata.fromJson(jsonMap);
         debugPrint('Camera metadata loaded from cache: $_cachedMetadata');
       } else {
-        // Fetch from hardware and save to cache
         _cachedMetadata = await CameraMetadataExtractor._getHardwareMetadata();
         await _saveToCache(_cachedMetadata!);
         debugPrint(
@@ -311,13 +308,13 @@ class CameraMetadataCache {
       }
     } catch (e) {
       debugPrint('Error initializing camera metadata cache: $e');
-      // Fallback to empty metadata
       _cachedMetadata = CameraMetadata();
     }
   }
 
   /// Save metadata to cache file
   static Future<void> _saveToCache(CameraMetadata metadata) async {
+    if (CameraMetadataExtractor.skipHardwareInTests) return;
     try {
       final filePath = await _getCacheFilePath();
       final file = File(filePath);
@@ -329,7 +326,6 @@ class CameraMetadataCache {
   }
 
   /// Get the cached hardware metadata
-  /// Returns null if not initialized - call initializeHardwareMetadata() first
   static CameraMetadata? getCachedMetadata() {
     return _cachedMetadata;
   }

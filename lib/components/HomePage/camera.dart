@@ -111,6 +111,7 @@ class Camera extends StatelessWidget {
           'assets/icons/Camera.svg',
           width: ResponsiveUtils.width(context, 20),
           height: ResponsiveUtils.width(context, 20),
+          placeholderBuilder: (_) => const SizedBox(),
         ),
       ),
     );

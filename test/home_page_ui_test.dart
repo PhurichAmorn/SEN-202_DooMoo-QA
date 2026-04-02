@@ -4,8 +4,8 @@ import 'package:doomoo/components/HomePage/camera.dart';
 import 'package:doomoo/components/HomePage/upload.dart';
 import 'package:doomoo/pages/camera.dart';
 import 'package:doomoo/pages/home.dart';
+import 'package:doomoo/services/yolo_detector.dart';
 
-// Mock NavigatorObserver to track navigation
 class MockNavigatorObserver extends NavigatorObserver {
   final List<Route<dynamic>> pushedRoutes = [];
 
@@ -17,7 +17,11 @@ class MockNavigatorObserver extends NavigatorObserver {
 }
 
 void main() {
-  group('Home Page UI Buttons Tests', () {
+  setUpAll(() {
+    YoloDetector.skipInTests = true;
+  });
+
+  group('test home page ui buttons', () {
     Future<void> setupTest(
       WidgetTester tester,
       Widget child, {
@@ -39,54 +43,41 @@ void main() {
       await tester.pumpAndSettle();
     }
 
-    testWidgets('Camera button displays and navigates correctly',
+    testWidgets('where Camera button is displayed then it navigates correctly',
         (WidgetTester tester) async {
       final mockObserver = MockNavigatorObserver();
+      await setupTest(tester, const Camera(), observers: [mockObserver]);
 
-      await setupTest(
-        tester,
-        const Camera(),
-        observers: [mockObserver],
-      );
-
-      // Verify UI elements exist
-      expect(find.text('ถ่ายรูปหมู'), findsOneWidget);
       final cameraButton = find.byKey(const Key('home_camera_button'));
+      expect(find.text('ถ่ายรูปหมู'), findsOneWidget);
       expect(cameraButton, findsOneWidget);
 
-      // Tap button using Key
       await tester.tap(cameraButton);
       await tester.pumpAndSettle();
 
       expect(find.byType(CameraPage), findsOneWidget);
     });
 
-    testWidgets('Upload button displays and triggers action',
+    testWidgets('where Upload button is displayed then it triggers action',
         (WidgetTester tester) async {
       await setupTest(tester, const Upload());
 
-      // Verify UI elements exist
-      expect(find.text('อัพโหลดรูปหมู'), findsOneWidget);
       final uploadButton = find.byKey(const Key('home_upload_button'));
+      expect(find.text('อัพโหลดรูปหมู'), findsOneWidget);
       expect(uploadButton, findsOneWidget);
 
-      // Tap button using Key
       await tester.tap(uploadButton);
       await tester.pumpAndSettle();
 
-      // Verify it didn't crash
       expect(tester.takeException(), isNull);
     });
 
-    testWidgets('where pressing upload will disable Camera button',
+    testWidgets('where Upload is processing then Camera button is disabled',
         (WidgetTester tester) async {
-      // We use the real HomePage which coordinates the state between Camera and Upload
-      // Set a large enough surface size for the whole page
       tester.view.physicalSize = const Size(400 * 3, 2000 * 3);
       tester.view.devicePixelRatio = 3.0;
       addTearDown(tester.view.resetPhysicalSize);
       addTearDown(tester.view.resetDevicePixelRatio);
-
       final mockObserver = MockNavigatorObserver();
       await tester.pumpWidget(
         MaterialApp(
@@ -96,34 +87,27 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      // Find both widgets
       final cameraFinder = find.byType(Camera);
       final uploadFinder = find.byType(Upload);
-
-      // Test Initially enabled
       Camera cameraWidget = tester.widget(cameraFinder);
       expect(cameraWidget.isDisabled, isFalse);
 
-      // Trigger processing state manually via the widget's callback
       final Upload uploadWidget = tester.widget(uploadFinder);
       uploadWidget.onProcessingChanged!(true);
-      await tester.pump(); // Rebuild with new state
-
-      // Verify Camera widget is now disabled in the UI
+      await tester.pump();
       cameraWidget = tester.widget(cameraFinder);
       expect(cameraWidget.isDisabled, isTrue);
 
-      // Try to tap the camera button while disabled
       final cameraButtonKeyFinder = find.byKey(const Key('home_camera_button'));
-      await tester.tap(cameraButtonKeyFinder);
+      await tester.ensureVisible(cameraButtonKeyFinder);
+      await tester.tap(cameraButtonKeyFinder, warnIfMissed: false);
       await tester.pumpAndSettle();
 
-      //Assert: No navigation should have occurred (only the initial route exists)
       expect(mockObserver.pushedRoutes.length, 1);
       expect(find.byType(CameraPage), findsNothing);
     });
 
-    testWidgets('where Home widgets render without crashing',
+    testWidgets('where Home widgets are used then they render without crashing',
         (WidgetTester tester) async {
       await setupTest(
         tester,
@@ -142,5 +126,3 @@ void main() {
     });
   });
 }
-
-// Note: The above test is not a complete test for UI testing, please use your own test for the UI testing assessment. This code will be part of   SEN-202:00030 Create and execute functional tests

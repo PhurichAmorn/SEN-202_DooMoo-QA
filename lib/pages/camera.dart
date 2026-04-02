@@ -133,6 +133,7 @@ class _CameraState extends State<CameraPage> {
                         'assets/icons/Camera.svg',
                         width: 77,
                         height: 77,
+                        placeholderBuilder: (_) => const SizedBox(),
                       ),
                     ),
                     if (_isProcessing) ...[

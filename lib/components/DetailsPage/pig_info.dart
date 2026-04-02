@@ -60,12 +60,8 @@ class _PigInfoState extends State<PigInfo> {
         widget.detectionResult != null && !widget.detectionResult!.isEmpty;
 
     return Padding(
-      padding: ResponsiveUtils.responsivePadding(context, horizontal: 31),
-      child: Container(
-        width: ResponsiveUtils.width(context, 90),
-        constraints: BoxConstraints(
-          minHeight: ResponsiveUtils.height(context, 40),
-        ),
+      padding: ResponsiveUtils.responsivePadding(context, bottom: 25),
+      child: DecoratedBox(
         decoration: BoxDecoration(
           color: const Color.fromRGBO(252, 252, 252, 30),
           borderRadius: BorderRadius.circular(15),
@@ -79,7 +75,7 @@ class _PigInfoState extends State<PigInfo> {
           ],
         ),
         child: Padding(
-          padding: ResponsiveUtils.responsivePadding(context, all: 32, top: 46),
+          padding: ResponsiveUtils.responsivePadding(context, all: 20, top: 30),
           child: hasDetections && widget.selectedPigIndex == null
               ? _buildSelectionPrompt(context)
               : hasDetections && widget.selectedPigIndex != null
@@ -98,16 +94,16 @@ class _PigInfoState extends State<PigInfo> {
         Text(
           'ตรวจพบหมู: ${widget.detectionResult!.count} ตัว',
           style: TextStyle(
-            fontSize: ResponsiveUtils.fontSize(context, 35),
+            fontSize: ResponsiveUtils.fontSize(context, 30),
             fontWeight: FontWeight.bold,
             color: Color(0xFF2671F4),
           ),
         ),
-        SizedBox(height: ResponsiveUtils.height(context, 2)),
+        SizedBox(height: ResponsiveUtils.height(context, 1)),
         Text(
           'แตะที่กรอบหมูเพื่อวิเคราะห์',
           style: TextStyle(
-            fontSize: ResponsiveUtils.fontSize(context, 28),
+            fontSize: ResponsiveUtils.fontSize(context, 24),
             color: Color(0xFF999999),
           ),
         ),
@@ -120,8 +116,6 @@ class _PigInfoState extends State<PigInfo> {
     final det = widget.detectionResult!.detections[widget.selectedPigIndex!];
     final box = det.boundingBox;
 
-    // Use PCA measurements from segmentation mask if available,
-    // otherwise fall back to bounding box
     final PigMeasurements? pca = det.mask != null
         ? PigMeasurements.fromMask(
             det.mask!,
@@ -132,13 +126,11 @@ class _PigInfoState extends State<PigInfo> {
           )
         : null;
 
-    // Pixel values: PCA-based or bounding box fallback
     final lengthPx = pca?.length ?? box.width;
-    final chestPx = pca?.widthTop ?? box.height; // top width = chest
-    final abdominalPx = pca?.widthMiddle ?? box.height; // middle = abdominal
-    final hipPx = pca?.widthBottom ?? box.height; // bottom = hip
+    final chestPx = pca?.widthTop ?? box.height;
+    final abdominalPx = pca?.widthMiddle ?? box.height;
+    final hipPx = pca?.widthBottom ?? box.height;
 
-    // Convert to real-world mm
     final lengthMm = _pixelToMm(lengthPx);
     final chestMm = _pixelToMm(chestPx);
     final abdominalMm = _pixelToMm(abdominalPx);
@@ -148,25 +140,24 @@ class _PigInfoState extends State<PigInfo> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Expanded(
+            Flexible(
               child: Text(
                 'หมูตัวที่ ${widget.selectedPigIndex! + 1}',
                 style: TextStyle(
-                  fontSize: ResponsiveUtils.fontSize(context, 35),
+                  fontSize: ResponsiveUtils.fontSize(context, 30),
                   fontWeight: FontWeight.bold,
                   color: Color(0xFF2671F4),
                 ),
+                overflow: TextOverflow.ellipsis,
               ),
             ),
             GestureDetector(
               onTap: widget.onReset,
               child: Container(
-                padding: ResponsiveUtils.responsivePadding(
-                  context,
-                  horizontal: 16,
-                  vertical: 8,
-                ),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 decoration: BoxDecoration(
                   color: Color(0xFFEEEEEE),
                   borderRadius: BorderRadius.circular(8),
@@ -174,7 +165,7 @@ class _PigInfoState extends State<PigInfo> {
                 child: Text(
                   'เลือกตัวอื่น',
                   style: TextStyle(
-                    fontSize: ResponsiveUtils.fontSize(context, 24),
+                    fontSize: ResponsiveUtils.fontSize(context, 20),
                     color: Color(0xFF5A5A5A),
                   ),
                 ),
@@ -182,18 +173,7 @@ class _PigInfoState extends State<PigInfo> {
             ),
           ],
         ),
-        if (AppConfig.debugMode) ...[
-          SizedBox(height: ResponsiveUtils.height(context, 1.5)),
-          Text(
-            'ความมั่นใจ: ${(det.confidence * 100).toStringAsFixed(1)}%',
-            style: TextStyle(
-              fontSize: ResponsiveUtils.fontSize(context, 28),
-              color: Color(0xFF5A5A5A),
-            ),
-          ),
-        ],
         SizedBox(height: ResponsiveUtils.height(context, 2)),
-        // Distance input
         _buildDistanceInput(context),
         SizedBox(height: ResponsiveUtils.height(context, 2)),
         _buildField(
@@ -209,45 +189,10 @@ class _PigInfoState extends State<PigInfo> {
               : '-',
           fontWeight: FontWeight.bold,
         ),
-        if (AppConfig.debugMode) ...[
-          SizedBox(height: ResponsiveUtils.height(context, 1.5)),
-          _buildField(
-            context,
-            'ความยาวลำตัว: ',
-            _distanceMm != null
-                ? _formatSize(lengthMm)
-                : '${lengthPx.toStringAsFixed(0)} px',
-          ),
-          SizedBox(height: ResponsiveUtils.height(context, 1.5)),
-          _buildField(
-            context,
-            'รอบอก (Chest): ',
-            _distanceMm != null
-                ? _formatSize(chestMm)
-                : '${chestPx.toStringAsFixed(0)} px',
-          ),
-          SizedBox(height: ResponsiveUtils.height(context, 1.5)),
-          _buildField(
-            context,
-            'ความกว้างท้อง (Abdominal): ',
-            _distanceMm != null
-                ? _formatSize(abdominalMm)
-                : '${abdominalPx.toStringAsFixed(0)} px',
-          ),
-          SizedBox(height: ResponsiveUtils.height(context, 1.5)),
-          _buildField(
-            context,
-            'ความกว้างสะโพก (Hip): ',
-            _distanceMm != null
-                ? _formatSize(hipMm)
-                : '${hipPx.toStringAsFixed(0)} px',
-          ),
-        ],
       ],
     );
   }
 
-  /// Distance input field
   Widget _buildDistanceInput(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -255,7 +200,7 @@ class _PigInfoState extends State<PigInfo> {
         Text(
           'ระยะห่างกล้องถึงหมู (เมตร):',
           style: TextStyle(
-            fontSize: ResponsiveUtils.fontSize(context, 28),
+            fontSize: ResponsiveUtils.fontSize(context, 24),
             fontWeight: FontWeight.bold,
             color: Color(0xFF5A5A5A),
           ),
@@ -270,59 +215,18 @@ class _PigInfoState extends State<PigInfo> {
                 keyboardType: TextInputType.numberWithOptions(decimal: true),
                 decoration: InputDecoration(
                   hintText: 'เช่น 0.67',
-                  hintStyle: TextStyle(
-                    fontSize: ResponsiveUtils.fontSize(context, 26),
-                    color: Color(0xFFBBBBBB),
-                  ),
                   errorText: _errorText,
-                  errorStyle: TextStyle(
-                    color: Colors.red,
-                    fontSize: ResponsiveUtils.fontSize(context, 22),
-                  ),
-                  contentPadding: EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 10,
-                  ),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                    borderSide: BorderSide(color: Color(0xFFDDDDDD)),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                    borderSide: BorderSide(color: Color(0xFF2671F4)),
-                  ),
                   suffixText: 'ม.',
                 ),
-                style: TextStyle(
-                  fontSize: ResponsiveUtils.fontSize(context, 28),
-                ),
                 onChanged: (_) {
-                  if (_errorText != null) {
-                    setState(() {
-                      _errorText = null;
-                    });
-                  }
+                  if (_errorText != null) setState(() => _errorText = null);
                 },
-                onSubmitted: (_) => _applyDistance(),
               ),
             ),
             SizedBox(width: 8),
             ElevatedButton(
               onPressed: _applyDistance,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Color(0xFF2671F4),
-                foregroundColor: Colors.white,
-                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-              ),
-              child: Text(
-                'คำนวณ',
-                style: TextStyle(
-                  fontSize: ResponsiveUtils.fontSize(context, 24),
-                ),
-              ),
+              child: const Text('คำนวณ'),
             ),
           ],
         ),
@@ -334,10 +238,9 @@ class _PigInfoState extends State<PigInfo> {
     final value = double.tryParse(_distanceController.text);
     if (value != null && value > 0) {
       setState(() {
-        _distanceMm = value * 1000; // convert meters to mm
+        _distanceMm = value * 1000;
         _errorText = null;
       });
-      FocusScope.of(context).unfocus();
     } else {
       setState(() {
         _errorText = 'ความสูงไม่ถูกต้อง';
@@ -346,28 +249,14 @@ class _PigInfoState extends State<PigInfo> {
     }
   }
 
-  /// No detections found
   Widget _buildNoDetections(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'ไม่พบหมูในรูป',
-          style: TextStyle(
-            fontSize: ResponsiveUtils.fontSize(context, 35),
-            fontWeight: FontWeight.bold,
-            color: Color(0xFF999999),
-          ),
-        ),
-        SizedBox(height: ResponsiveUtils.height(context, 2)),
-        _buildField(context, 'น้ำหนัก: ', ''),
-        SizedBox(height: ResponsiveUtils.height(context, 1.5)),
-        _buildField(context, 'รอบอก: ', ''),
-        SizedBox(height: ResponsiveUtils.height(context, 1.5)),
-        _buildField(context, 'ความยาวลำตัว: ', ''),
-        SizedBox(height: ResponsiveUtils.height(context, 1.5)),
-        _buildField(context, 'ความกว้างลำตัว: ', ''),
-      ],
+    return Text(
+      'ไม่พบหมูในรูป',
+      style: TextStyle(
+        fontSize: ResponsiveUtils.fontSize(context, 30),
+        fontWeight: FontWeight.bold,
+        color: Color(0xFF999999),
+      ),
     );
   }
 
@@ -376,7 +265,7 @@ class _PigInfoState extends State<PigInfo> {
     return Text(
       '$label$value',
       style: TextStyle(
-        fontSize: ResponsiveUtils.fontSize(context, 35),
+        fontSize: ResponsiveUtils.fontSize(context, 30),
         color: Color(0xFF5A5A5A),
         fontWeight: fontWeight,
       ),
