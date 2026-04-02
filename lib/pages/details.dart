@@ -83,7 +83,7 @@ class _DetailsPageState extends State<DetailsPage> {
                 .copyWith(detections: updatedDetections);
           });
         }
-      } catch (e, stack) {
+      } catch (e) {
         debugPrint('Error running segmentation: $e');
       } finally {
         if (mounted) {

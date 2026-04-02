@@ -3,7 +3,6 @@ import 'package:doomoo/utils/responsive.dart';
 import 'package:doomoo/models/detection_result.dart';
 import 'package:doomoo/utils/camera_metadata.dart';
 import 'package:doomoo/utils/pig_measurements.dart';
-import 'package:doomoo/utils/config.dart';
 import 'package:doomoo/utils/pig_math.dart';
 
 class PigInfo extends StatefulWidget {
@@ -47,11 +46,6 @@ class _PigInfoState extends State<PigInfo> {
       imageWidth: meta?.imageWidth,
       imageHeight: meta?.imageHeight,
     );
-  }
-
-  String _formatSize(double? mm) {
-    if (mm == null) return '-';
-    return '${(mm / 10).toStringAsFixed(1)} cm';
   }
 
   @override

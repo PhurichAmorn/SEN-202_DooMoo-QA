@@ -1,4 +1,3 @@
-import 'dart:typed_data';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:onnxruntime_v2/onnxruntime_v2.dart';
@@ -49,7 +48,7 @@ class YoloDetector {
       _session = OrtSession.fromBuffer(modelBytes, sessionOptions);
       sessionOptions.release();
       _isReady = true;
-    } catch (e, stack) {
+    } catch (e) {
       debugPrint('Failed to load YOLO model: $e');
       rethrow;
     }
@@ -121,7 +120,7 @@ class YoloDetector {
       }
 
       return result;
-    } catch (e, stack) {
+    } catch (e) {
       debugPrint('Object detection failed: $e');
       return [];
     }

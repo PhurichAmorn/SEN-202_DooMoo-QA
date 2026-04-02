@@ -51,7 +51,7 @@ class PigDetector {
       sessionOptions.release();
 
       _isReady = true;
-    } catch (e, stack) {
+    } catch (e) {
       debugPrint('Failed to load ONNX model: $e');
       rethrow;
     }
@@ -108,7 +108,7 @@ class PigDetector {
         imageWidth: preprocessed.originalWidth,
         imageHeight: preprocessed.originalHeight,
       );
-    } catch (e, stack) {
+    } catch (e) {
       debugPrint('Segmentation inference failed: $e');
       return DetectionResult(
         detections: [],

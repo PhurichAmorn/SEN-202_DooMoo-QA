@@ -6,7 +6,6 @@ import 'package:doomoo/utils/camera_metadata.dart';
 import 'package:doomoo/utils/config.dart';
 import 'package:doomoo/components/DetailsPage/camera_metadata_info.dart';
 import 'package:doomoo/components/DetailsPage/pig_image_with_overlay.dart';
-import 'package:doomoo/components/DetailsPage/pig_info.dart';
 import 'package:doomoo/services/pig_detector.dart';
 
 void main() {
