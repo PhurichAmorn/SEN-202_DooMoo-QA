@@ -4,8 +4,7 @@ import 'package:doomoo/models/detection_result.dart';
 
 void main() {
   group('test detection result', () {
-    test(
-        'where detection result is created then it correctly reports count',
+    test('where detection result is created then it correctly reports count',
         () {
       final detection = PigDetection(
         boundingBox: const Rect.fromLTWH(0, 0, 10, 10),
