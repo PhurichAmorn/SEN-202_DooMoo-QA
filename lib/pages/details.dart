@@ -225,6 +225,7 @@ class _DetailsPageState extends State<DetailsPage> {
         ),
       ),
       leading: GestureDetector(
+        key: const Key('details_back_button'),
         onTap: () {
           Navigator.pushReplacement(
             context,
