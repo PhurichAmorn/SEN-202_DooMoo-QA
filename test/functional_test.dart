@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:doomoo/pages/details.dart';
-import 'package:doomoo/pages/home.dart';
 import 'package:doomoo/models/detection_result.dart';
 import 'package:doomoo/utils/camera_metadata.dart';
 import 'package:doomoo/utils/config.dart';
