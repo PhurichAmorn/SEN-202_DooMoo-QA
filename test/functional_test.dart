@@ -54,7 +54,8 @@ DetectionResult _makeResult({int count = 1}) => DetectionResult(
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
-Future<void> _pumpDetails(WidgetTester tester, {DetectionResult? result}) async {
+Future<void> _pumpDetails(WidgetTester tester,
+    {DetectionResult? result}) async {
   tester.view.physicalSize = const Size(1000, 2000);
   tester.view.devicePixelRatio = 1.0;
   addTearDown(tester.view.resetPhysicalSize);
@@ -229,8 +230,7 @@ void main() {
       expect(find.text('น้ำหนัก: -'), findsOneWidget);
     });
 
-    testWidgets(
-        'when empty field submitted then error is shown not a crash',
+    testWidgets('when empty field submitted then error is shown not a crash',
         (tester) async {
       await _pumpDetails(tester);
       await _selectPig(tester, 0);
@@ -291,7 +291,8 @@ void main() {
   // ── 4. Navigation: Details → Home ──────────────────────────────────────────
 
   group('functional: navigation', () {
-    testWidgets('when back button tapped from details page then home page shown',
+    testWidgets(
+        'when back button tapped from details page then home page shown',
         (tester) async {
       tester.view.physicalSize = const Size(1000, 2000);
       tester.view.devicePixelRatio = 1.0;
@@ -377,8 +378,7 @@ void main() {
       expect(find.textContaining('น้ำหนัก:'), findsNothing);
     });
 
-    testWidgets(
-        'when three pigs detected then count label shows 3',
+    testWidgets('when three pigs detected then count label shows 3',
         (tester) async {
       await _pumpDetails(tester, result: _makeResult(count: 3));
 
