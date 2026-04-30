@@ -43,23 +43,26 @@ void main() {
       await tester.pumpAndSettle();
     }
 
-    testWidgets('where Camera button is displayed then it navigates correctly',
-        (WidgetTester tester) async {
-      final mockObserver = MockNavigatorObserver();
-      await setupTest(tester, const Camera(), observers: [mockObserver]);
+    testWidgets(
+      'where Camera button is displayed then it navigates correctly',
+      (WidgetTester tester) async {
+        final mockObserver = MockNavigatorObserver();
+        await setupTest(tester, const Camera(), observers: [mockObserver]);
 
-      final cameraButton = find.byKey(const Key('home_camera_button'));
-      expect(find.text('ถ่ายรูปหมู'), findsOneWidget);
-      expect(cameraButton, findsOneWidget);
+        final cameraButton = find.byKey(const Key('home_camera_button'));
+        expect(find.text('ถ่ายรูปหมู'), findsOneWidget);
+        expect(cameraButton, findsOneWidget);
 
-      await tester.tap(cameraButton);
-      await tester.pumpAndSettle();
+        await tester.tap(cameraButton);
+        await tester.pumpAndSettle();
 
-      expect(find.byType(CameraPage), findsOneWidget);
-    });
+        expect(find.byType(CameraPage), findsOneWidget);
+      },
+    );
 
-    testWidgets('where Upload button is displayed then it triggers action',
-        (WidgetTester tester) async {
+    testWidgets('where Upload button is displayed then it triggers action', (
+      WidgetTester tester,
+    ) async {
       await setupTest(tester, const Upload());
 
       final uploadButton = find.byKey(const Key('home_upload_button'));
@@ -72,18 +75,16 @@ void main() {
       expect(tester.takeException(), isNull);
     });
 
-    testWidgets('where Upload is processing then Camera button is disabled',
-        (WidgetTester tester) async {
+    testWidgets('where Upload is processing then Camera button is disabled', (
+      WidgetTester tester,
+    ) async {
       tester.view.physicalSize = const Size(400 * 3, 2000 * 3);
       tester.view.devicePixelRatio = 3.0;
       addTearDown(tester.view.resetPhysicalSize);
       addTearDown(tester.view.resetDevicePixelRatio);
       final mockObserver = MockNavigatorObserver();
       await tester.pumpWidget(
-        MaterialApp(
-          home: const HomePage(),
-          navigatorObservers: [mockObserver],
-        ),
+        MaterialApp(home: const HomePage(), navigatorObservers: [mockObserver]),
       );
       await tester.pumpAndSettle();
 
@@ -107,22 +108,19 @@ void main() {
       expect(find.byType(CameraPage), findsNothing);
     });
 
-    testWidgets('where Home widgets are used then they render without crashing',
-        (WidgetTester tester) async {
-      await setupTest(
-        tester,
-        const SingleChildScrollView(
-          child: Column(
-            children: [
-              Camera(),
-              Upload(),
-            ],
+    testWidgets(
+      'where Home widgets are used then they render without crashing',
+      (WidgetTester tester) async {
+        await setupTest(
+          tester,
+          const SingleChildScrollView(
+            child: Column(children: [Camera(), Upload()]),
           ),
-        ),
-      );
+        );
 
-      expect(find.byType(Camera), findsOneWidget);
-      expect(find.byType(Upload), findsOneWidget);
-    });
+        expect(find.byType(Camera), findsOneWidget);
+        expect(find.byType(Upload), findsOneWidget);
+      },
+    );
   });
 }

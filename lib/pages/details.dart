@@ -66,21 +66,25 @@ class _DetailsPageState extends State<DetailsPage> {
           (det.boundingBox.bottom + padding).clamp(0, imgH),
         );
 
-        final rfResult =
-            await rfDetr.detect(widget.imagePath!, cropRect: cropRect);
+        final rfResult = await rfDetr.detect(
+          widget.imagePath!,
+          cropRect: cropRect,
+        );
 
         if (rfResult.detections.isNotEmpty && mounted) {
           final bestSeg = rfResult.detections.first;
-          final updatedDetections =
-              List<PigDetection>.from(_currentDetectionResult!.detections);
+          final updatedDetections = List<PigDetection>.from(
+            _currentDetectionResult!.detections,
+          );
           updatedDetections[index] = det.copyWith(
             mask: bestSeg.mask,
             maskRect: bestSeg.maskRect,
           );
 
           setState(() {
-            _currentDetectionResult = _currentDetectionResult!
-                .copyWith(detections: updatedDetections);
+            _currentDetectionResult = _currentDetectionResult!.copyWith(
+              detections: updatedDetections,
+            );
           });
         }
       } catch (e) {
@@ -142,7 +146,9 @@ class _DetailsPageState extends State<DetailsPage> {
                   child: Center(
                     child: Container(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 32, vertical: 24),
+                        horizontal: 32,
+                        vertical: 24,
+                      ),
                       decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(16),
@@ -151,7 +157,7 @@ class _DetailsPageState extends State<DetailsPage> {
                             color: Colors.black26,
                             blurRadius: 10,
                             offset: Offset(0, 4),
-                          )
+                          ),
                         ],
                       ),
                       child: Column(
@@ -208,7 +214,8 @@ class _DetailsPageState extends State<DetailsPage> {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: Text(
-                      'Debug Mode: ${AppConfig.debugMode ? "Enabled" : "Disabled"}'),
+                    'Debug Mode: ${AppConfig.debugMode ? "Enabled" : "Disabled"}',
+                  ),
                   duration: const Duration(seconds: 1),
                 ),
               );

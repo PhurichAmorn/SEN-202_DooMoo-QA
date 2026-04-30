@@ -73,8 +73,8 @@ class _PigInfoState extends State<PigInfo> {
           child: hasDetections && widget.selectedPigIndex == null
               ? _buildSelectionPrompt(context)
               : hasDetections && widget.selectedPigIndex != null
-                  ? _buildSelectedPigInfo(context)
-                  : _buildNoDetections(context),
+              ? _buildSelectedPigInfo(context)
+              : _buildNoDetections(context),
         ),
       ),
     );
@@ -150,8 +150,10 @@ class _PigInfoState extends State<PigInfo> {
             GestureDetector(
               onTap: widget.onReset,
               child: Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 6,
+                ),
                 decoration: BoxDecoration(
                   color: Color(0xFFEEEEEE),
                   borderRadius: BorderRadius.circular(8),
@@ -254,8 +256,12 @@ class _PigInfoState extends State<PigInfo> {
     );
   }
 
-  Widget _buildField(BuildContext context, String label, String value,
-      {FontWeight fontWeight = FontWeight.normal}) {
+  Widget _buildField(
+    BuildContext context,
+    String label,
+    String value, {
+    FontWeight fontWeight = FontWeight.normal,
+  }) {
     return Text(
       '$label$value',
       style: TextStyle(

@@ -198,8 +198,8 @@ class CameraMetadataExtractor {
   static Future<CameraMetadata> _getHardwareMetadata() async {
     if (skipHardwareInTests) return CameraMetadata();
     try {
-      final Map<String, dynamic>? cameraInfo =
-          await _channel.invokeMapMethod<String, dynamic>('getCameraInfo');
+      final Map<String, dynamic>? cameraInfo = await _channel
+          .invokeMapMethod<String, dynamic>('getCameraInfo');
 
       if (cameraInfo != null) {
         return CameraMetadata(
@@ -304,7 +304,8 @@ class CameraMetadataCache {
         _cachedMetadata = await CameraMetadataExtractor._getHardwareMetadata();
         await _saveToCache(_cachedMetadata!);
         debugPrint(
-            'Camera metadata fetched from hardware and cached: $_cachedMetadata');
+          'Camera metadata fetched from hardware and cached: $_cachedMetadata',
+        );
       }
     } catch (e) {
       debugPrint('Error initializing camera metadata cache: $e');

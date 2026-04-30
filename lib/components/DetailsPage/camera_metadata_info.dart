@@ -101,8 +101,9 @@ class CameraMetadataInfo extends StatelessWidget {
     final fontSize = ResponsiveUtils.fontSize(context, 26);
 
     return Padding(
-      padding:
-          EdgeInsets.symmetric(vertical: ResponsiveUtils.height(context, 0.5)),
+      padding: EdgeInsets.symmetric(
+        vertical: ResponsiveUtils.height(context, 0.5),
+      ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -110,10 +111,7 @@ class CameraMetadataInfo extends StatelessWidget {
             flex: 1,
             child: Text(
               label,
-              style: TextStyle(
-                fontSize: fontSize,
-                color: Color(0xFF5A5A5A),
-              ),
+              style: TextStyle(fontSize: fontSize, color: Color(0xFF5A5A5A)),
               overflow: TextOverflow.ellipsis,
             ),
           ),

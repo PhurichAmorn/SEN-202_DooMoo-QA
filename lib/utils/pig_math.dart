@@ -61,7 +61,8 @@ class PigMath {
         hipWidthMm == null) {
       return '-';
     }
-    final weight = -21.95431 +
+    final weight =
+        -21.95431 +
         0.31079 * (bodyLengthMm / 10) +
         0.43166 * (chestWidthMm / 10) +
         0.47990 * (abdominalWidthMm / 10) +

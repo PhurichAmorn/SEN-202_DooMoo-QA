@@ -93,35 +93,33 @@ class _PigImageState extends State<PigImage> {
                 color: const Color(0xFFD9D9D9),
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: const Center(
-                child: CircularProgressIndicator(),
-              ),
+              child: const Center(child: CircularProgressIndicator()),
             )
           : _aspectRatio != null
-              ? AspectRatio(
-                  aspectRatio: _aspectRatio!,
-                  child: Container(
-                    width: ResponsiveUtils.width(context, 90),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFD9D9D9),
-                      borderRadius: BorderRadius.circular(12),
-                      image: widget.imagePath != null
-                          ? DecorationImage(
-                              image: FileImage(File(widget.imagePath!)),
-                              fit: BoxFit.cover,
-                            )
-                          : null,
-                    ),
-                  ),
-                )
-              : Container(
-                  width: ResponsiveUtils.width(context, 90),
-                  height: ResponsiveUtils.height(context, 32),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFD9D9D9),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
+          ? AspectRatio(
+              aspectRatio: _aspectRatio!,
+              child: Container(
+                width: ResponsiveUtils.width(context, 90),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFD9D9D9),
+                  borderRadius: BorderRadius.circular(12),
+                  image: widget.imagePath != null
+                      ? DecorationImage(
+                          image: FileImage(File(widget.imagePath!)),
+                          fit: BoxFit.cover,
+                        )
+                      : null,
                 ),
+              ),
+            )
+          : Container(
+              width: ResponsiveUtils.width(context, 90),
+              height: ResponsiveUtils.height(context, 32),
+              decoration: BoxDecoration(
+                color: const Color(0xFFD9D9D9),
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
     );
   }
 }

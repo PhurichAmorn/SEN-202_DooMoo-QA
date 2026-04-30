@@ -27,25 +27,34 @@ void main() {
       expect(result.data.length, 1 * 3 * 32 * 32);
     });
 
-    test('where image is cropped then preprocessed then dimensions match crop',
-        () {
-      const cropRect = Rect.fromLTWH(10, 10, 50, 50);
-      final result =
-          ImagePreprocessor.cropAndPreprocess(testImagePath, cropRect, 32);
-      expect(result.cropRect, cropRect);
-      expect(result.targetWidth, 32);
-    });
+    test(
+      'where image is cropped then preprocessed then dimensions match crop',
+      () {
+        const cropRect = Rect.fromLTWH(10, 10, 50, 50);
+        final result = ImagePreprocessor.cropAndPreprocess(
+          testImagePath,
+          cropRect,
+          32,
+        );
+        expect(result.cropRect, cropRect);
+        expect(result.targetWidth, 32);
+      },
+    );
 
     test('where invalid path is provided then it throws', () {
-      expect(() => ImagePreprocessor.preprocess('invalid.jpg', 32),
-          throwsA(isA<PathNotFoundException>()));
+      expect(
+        () => ImagePreprocessor.preprocess('invalid.jpg', 32),
+        throwsA(isA<PathNotFoundException>()),
+      );
     });
 
     test('where non-image file is provided then it throws', () async {
       const tempPath = 'not_image.txt';
       await File(tempPath).writeAsString('hello world');
       expect(
-          () => ImagePreprocessor.preprocess(tempPath, 32), throwsA(anything));
+        () => ImagePreprocessor.preprocess(tempPath, 32),
+        throwsA(anything),
+      );
       await File(tempPath).delete();
     });
   });

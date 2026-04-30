@@ -38,43 +38,48 @@ final _meta = CameraMetadata(
 // At 1.0 m → all real-world measurements ≈ 494.38 mm → weight ≈ 59.6 kg.
 // At 2.0 m → all measurements ≈ 988.76 mm → weight ≈ 141.1 kg.
 DetectionResult _makeResult({int count = 1}) => DetectionResult(
-      imageWidth: 1000,
-      imageHeight: 1000,
-      detections: List.generate(count, (i) {
-        final offset = i * 50.0;
-        return PigDetection(
-          boundingBox: Rect.fromLTRB(100 + offset, 100, 500 + offset, 500),
-          confidence: 0.9 - i * 0.05,
-          classId: 0,
-          mask: List.generate(50, (_) => List.generate(50, (_) => 1.0)),
-          maskRect: Rect.fromLTRB(100 + offset, 100, 500 + offset, 500),
-        );
-      }),
+  imageWidth: 1000,
+  imageHeight: 1000,
+  detections: List.generate(count, (i) {
+    final offset = i * 50.0;
+    return PigDetection(
+      boundingBox: Rect.fromLTRB(100 + offset, 100, 500 + offset, 500),
+      confidence: 0.9 - i * 0.05,
+      classId: 0,
+      mask: List.generate(50, (_) => List.generate(50, (_) => 1.0)),
+      maskRect: Rect.fromLTRB(100 + offset, 100, 500 + offset, 500),
     );
+  }),
+);
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
-Future<void> _pumpDetails(WidgetTester tester,
-    {DetectionResult? result}) async {
+Future<void> _pumpDetails(
+  WidgetTester tester, {
+  DetectionResult? result,
+}) async {
   tester.view.physicalSize = const Size(1000, 2000);
   tester.view.devicePixelRatio = 1.0;
   addTearDown(tester.view.resetPhysicalSize);
   addTearDown(tester.view.resetDevicePixelRatio);
 
-  await tester.pumpWidget(MaterialApp(
-    home: DetailsPage(
-      imagePath: 'test_assets/pig.jpg',
-      cameraMetadata: _meta,
-      detectionResult: result ?? _makeResult(),
+  await tester.pumpWidget(
+    MaterialApp(
+      home: DetailsPage(
+        imagePath: 'test_assets/pig.jpg',
+        cameraMetadata: _meta,
+        detectionResult: result ?? _makeResult(),
+      ),
     ),
-  ));
+  );
   await tester.pump(const Duration(milliseconds: 100));
   await tester.pump();
 }
 
 Future<void> _selectPig(WidgetTester tester, int index) async {
-  final overlay =
-      tester.widget<PigImageWithOverlay>(find.byType(PigImageWithOverlay));
+  final overlay = tester.widget<PigImageWithOverlay>(
+    find.byType(PigImageWithOverlay),
+  );
   overlay.onPigSelected?.call(index);
   await tester.pump();
   await tester.pump(const Duration(milliseconds: 300));
@@ -117,99 +122,106 @@ void main() {
 
   group('functional: weight calculation pipeline', () {
     testWidgets(
-        'when pig selected and no distance entered then weight shows dash',
-        (tester) async {
-      await _pumpDetails(tester);
-      await _selectPig(tester, 0);
+      'when pig selected and no distance entered then weight shows dash',
+      (tester) async {
+        await _pumpDetails(tester);
+        await _selectPig(tester, 0);
 
-      expect(find.text('น้ำหนัก: -'), findsOneWidget);
-    });
-
-    testWidgets(
-        'when valid distance entered then weight shown in kg format with positive value',
-        (tester) async {
-      await _pumpDetails(tester);
-      await _selectPig(tester, 0);
-      await _calculate(tester, '1.0');
-
-      final text = _weightText(tester);
-      expect(text, isNotNull);
-      expect(text, matches(RegExp(r'น้ำหนัก: \d+\.?\d* kg')));
-      final kg = _parseWeight(text);
-      expect(kg, isNotNull);
-      expect(kg! > 0, isTrue);
-    });
+        expect(find.text('น้ำหนัก: -'), findsOneWidget);
+      },
+    );
 
     testWidgets(
-        'when distance is 1.0 m then weight matches pinhole model calculation',
-        (tester) async {
-      // Precomputed: 50×50 mask, 400×400 box, camera above → all dims 392 px
-      // → realMm ≈ 494.38 mm each → weight ≈ 59.6 kg
-      await _pumpDetails(tester);
-      await _selectPig(tester, 0);
-      await _calculate(tester, '1.0');
+      'when valid distance entered then weight shown in kg format with positive value',
+      (tester) async {
+        await _pumpDetails(tester);
+        await _selectPig(tester, 0);
+        await _calculate(tester, '1.0');
 
-      expect(_weightText(tester), 'น้ำหนัก: 59.6 kg');
-    });
-
-    testWidgets(
-        'when distance is doubled to 2.0 m then weight is larger and updates',
-        (tester) async {
-      // At 2.0 m → all dims ≈ 988.76 mm → weight ≈ 141.1 kg
-      await _pumpDetails(tester);
-      await _selectPig(tester, 0);
-
-      await _calculate(tester, '1.0');
-      final w1 = _parseWeight(_weightText(tester));
-
-      await _calculate(tester, '2.0');
-      final w2 = _parseWeight(_weightText(tester));
-
-      expect(w1, isNotNull);
-      expect(w2, isNotNull);
-      expect(w2! > w1!, isTrue);
-      expect(_weightText(tester), 'น้ำหนัก: 141.1 kg');
-    });
+        final text = _weightText(tester);
+        expect(text, isNotNull);
+        expect(text, matches(RegExp(r'น้ำหนัก: \d+\.?\d* kg')));
+        final kg = _parseWeight(text);
+        expect(kg, isNotNull);
+        expect(kg! > 0, isTrue);
+      },
+    );
 
     testWidgets(
-        'when distance input is replaced then weight reflects the latest value',
-        (tester) async {
-      await _pumpDetails(tester);
-      await _selectPig(tester, 0);
+      'when distance is 1.0 m then weight matches pinhole model calculation',
+      (tester) async {
+        // Precomputed: 50×50 mask, 400×400 box, camera above → all dims 392 px
+        // → realMm ≈ 494.38 mm each → weight ≈ 59.6 kg
+        await _pumpDetails(tester);
+        await _selectPig(tester, 0);
+        await _calculate(tester, '1.0');
 
-      await _calculate(tester, '2.0');
-      final before = _weightText(tester);
+        expect(_weightText(tester), 'น้ำหนัก: 59.6 kg');
+      },
+    );
 
-      await _calculate(tester, '1.0');
-      final after = _weightText(tester);
+    testWidgets(
+      'when distance is doubled to 2.0 m then weight is larger and updates',
+      (tester) async {
+        // At 2.0 m → all dims ≈ 988.76 mm → weight ≈ 141.1 kg
+        await _pumpDetails(tester);
+        await _selectPig(tester, 0);
 
-      expect(before, isNot(equals(after)));
-      expect(after, 'น้ำหนัก: 59.6 kg');
-    });
+        await _calculate(tester, '1.0');
+        final w1 = _parseWeight(_weightText(tester));
+
+        await _calculate(tester, '2.0');
+        final w2 = _parseWeight(_weightText(tester));
+
+        expect(w1, isNotNull);
+        expect(w2, isNotNull);
+        expect(w2! > w1!, isTrue);
+        expect(_weightText(tester), 'น้ำหนัก: 141.1 kg');
+      },
+    );
+
+    testWidgets(
+      'when distance input is replaced then weight reflects the latest value',
+      (tester) async {
+        await _pumpDetails(tester);
+        await _selectPig(tester, 0);
+
+        await _calculate(tester, '2.0');
+        final before = _weightText(tester);
+
+        await _calculate(tester, '1.0');
+        final after = _weightText(tester);
+
+        expect(before, isNot(equals(after)));
+        expect(after, 'น้ำหนัก: 59.6 kg');
+      },
+    );
   });
 
   // ── 2. Distance input error recovery ───────────────────────────────────────
 
   group('functional: distance input error recovery', () {
     testWidgets(
-        'when invalid text entered then corrected then error clears and weight shown',
-        (tester) async {
-      await _pumpDetails(tester);
-      await _selectPig(tester, 0);
+      'when invalid text entered then corrected then error clears and weight shown',
+      (tester) async {
+        await _pumpDetails(tester);
+        await _selectPig(tester, 0);
 
-      // Bad input → error visible, no weight
-      await _calculate(tester, 'abc');
-      expect(find.text('ความสูงไม่ถูกต้อง'), findsOneWidget);
-      expect(find.text('น้ำหนัก: -'), findsOneWidget);
+        // Bad input → error visible, no weight
+        await _calculate(tester, 'abc');
+        expect(find.text('ความสูงไม่ถูกต้อง'), findsOneWidget);
+        expect(find.text('น้ำหนัก: -'), findsOneWidget);
 
-      // Fix → error gone, weight shown
-      await _calculate(tester, '1.0');
-      expect(find.text('ความสูงไม่ถูกต้อง'), findsNothing);
-      expect(_weightText(tester), 'น้ำหนัก: 59.6 kg');
-    });
+        // Fix → error gone, weight shown
+        await _calculate(tester, '1.0');
+        expect(find.text('ความสูงไม่ถูกต้อง'), findsNothing);
+        expect(_weightText(tester), 'น้ำหนัก: 59.6 kg');
+      },
+    );
 
-    testWidgets('when negative distance entered then error is shown',
-        (tester) async {
+    testWidgets('when negative distance entered then error is shown', (
+      tester,
+    ) async {
       await _pumpDetails(tester);
       await _selectPig(tester, 0);
 
@@ -219,8 +231,9 @@ void main() {
       expect(find.text('น้ำหนัก: -'), findsOneWidget);
     });
 
-    testWidgets('when zero distance entered then error is shown',
-        (tester) async {
+    testWidgets('when zero distance entered then error is shown', (
+      tester,
+    ) async {
       await _pumpDetails(tester);
       await _selectPig(tester, 0);
 
@@ -230,8 +243,9 @@ void main() {
       expect(find.text('น้ำหนัก: -'), findsOneWidget);
     });
 
-    testWidgets('when empty field submitted then error is shown not a crash',
-        (tester) async {
+    testWidgets('when empty field submitted then error is shown not a crash', (
+      tester,
+    ) async {
       await _pumpDetails(tester);
       await _selectPig(tester, 0);
 
@@ -246,30 +260,32 @@ void main() {
 
   group('functional: debug mode lifecycle', () {
     testWidgets(
-        'when title long pressed twice then metadata panel appears then disappears',
-        (tester) async {
-      AppConfig.debugMode = false;
-      await _pumpDetails(tester);
+      'when title long pressed twice then metadata panel appears then disappears',
+      (tester) async {
+        AppConfig.debugMode = false;
+        await _pumpDetails(tester);
 
-      // Off → panel hidden
-      expect(find.byType(CameraMetadataInfo), findsNothing);
+        // Off → panel hidden
+        expect(find.byType(CameraMetadataInfo), findsNothing);
 
-      // First long press → on
-      await tester.longPress(find.text('รายละเอียด'));
-      await tester.pump();
-      expect(AppConfig.debugMode, isTrue);
-      expect(find.byType(CameraMetadataInfo), findsOneWidget);
-      expect(find.byType(SnackBar), findsOneWidget);
+        // First long press → on
+        await tester.longPress(find.text('รายละเอียด'));
+        await tester.pump();
+        expect(AppConfig.debugMode, isTrue);
+        expect(find.byType(CameraMetadataInfo), findsOneWidget);
+        expect(find.byType(SnackBar), findsOneWidget);
 
-      // Second long press → off
-      await tester.longPress(find.text('รายละเอียด'));
-      await tester.pump();
-      expect(AppConfig.debugMode, isFalse);
-      expect(find.byType(CameraMetadataInfo), findsNothing);
-    });
+        // Second long press → off
+        await tester.longPress(find.text('รายละเอียด'));
+        await tester.pump();
+        expect(AppConfig.debugMode, isFalse);
+        expect(find.byType(CameraMetadataInfo), findsNothing);
+      },
+    );
 
-    testWidgets('when debug mode is on then snackbar text reflects state',
-        (tester) async {
+    testWidgets('when debug mode is on then snackbar text reflects state', (
+      tester,
+    ) async {
       AppConfig.debugMode = false;
       await _pumpDetails(tester);
 
@@ -278,8 +294,9 @@ void main() {
       expect(find.textContaining('Enabled'), findsOneWidget);
 
       // Dismiss the first snackbar so the second one appears immediately.
-      ScaffoldMessenger.of(tester.element(find.byType(Scaffold)))
-          .hideCurrentSnackBar();
+      ScaffoldMessenger.of(
+        tester.element(find.byType(Scaffold)),
+      ).hideCurrentSnackBar();
       await tester.pump();
 
       await tester.longPress(find.text('รายละเอียด'));
@@ -292,94 +309,103 @@ void main() {
 
   group('functional: navigation', () {
     testWidgets(
-        'when back button tapped from details page then home page shown',
-        (tester) async {
-      tester.view.physicalSize = const Size(1000, 2000);
-      tester.view.devicePixelRatio = 1.0;
-      addTearDown(tester.view.resetPhysicalSize);
-      addTearDown(tester.view.resetDevicePixelRatio);
+      'when back button tapped from details page then home page shown',
+      (tester) async {
+        tester.view.physicalSize = const Size(1000, 2000);
+        tester.view.devicePixelRatio = 1.0;
+        addTearDown(tester.view.resetPhysicalSize);
+        addTearDown(tester.view.resetDevicePixelRatio);
 
-      bool didNavigate = false;
-      final observer = _ReplaceObserver(onReplace: () => didNavigate = true);
+        bool didNavigate = false;
+        final observer = _ReplaceObserver(onReplace: () => didNavigate = true);
 
-      await tester.pumpWidget(MaterialApp(
-        home: DetailsPage(
-          imagePath: 'test_assets/pig.jpg',
-          cameraMetadata: _meta,
-          detectionResult: _makeResult(),
-        ),
-        navigatorObservers: [observer],
-      ));
-      await tester.pump(const Duration(milliseconds: 100));
-      await tester.pump();
+        await tester.pumpWidget(
+          MaterialApp(
+            home: DetailsPage(
+              imagePath: 'test_assets/pig.jpg',
+              cameraMetadata: _meta,
+              detectionResult: _makeResult(),
+            ),
+            navigatorObservers: [observer],
+          ),
+        );
+        await tester.pump(const Duration(milliseconds: 100));
+        await tester.pump();
 
-      expect(find.text('รายละเอียด'), findsOneWidget);
+        expect(find.text('รายละเอียด'), findsOneWidget);
 
-      // Tap the keyed back button.
-      final backButton = find.byKey(const Key('details_back_button'));
-      expect(backButton, findsOneWidget);
-      await tester.tap(backButton);
-      await tester.pump(); // process tap → pushReplacement fires
+        // Tap the keyed back button.
+        final backButton = find.byKey(const Key('details_back_button'));
+        expect(backButton, findsOneWidget);
+        await tester.tap(backButton);
+        await tester.pump(); // process tap → pushReplacement fires
 
-      // NavigatorObserver.didReplace fires synchronously on route replacement.
-      expect(didNavigate, isTrue,
-          reason: 'Back button should have called Navigator.pushReplacement');
+        // NavigatorObserver.didReplace fires synchronously on route replacement.
+        expect(
+          didNavigate,
+          isTrue,
+          reason: 'Back button should have called Navigator.pushReplacement',
+        );
 
-      // Advance past the 300 ms route transition animation.
-      await tester.pump(const Duration(milliseconds: 350));
+        // Advance past the 300 ms route transition animation.
+        await tester.pump(const Duration(milliseconds: 350));
 
-      // DetailsPage title is gone; HomePage title is visible.
-      expect(find.text('รายละเอียด'), findsNothing);
-      expect(find.text('DooMoo'), findsOneWidget);
-    });
+        // DetailsPage title is gone; HomePage title is visible.
+        expect(find.text('รายละเอียด'), findsNothing);
+        expect(find.text('DooMoo'), findsOneWidget);
+      },
+    );
   });
 
   // ── 5. Multi-pig selection cycle ───────────────────────────────────────────
 
   group('functional: multi-pig selection cycle', () {
     testWidgets(
-        'when two pigs exist then selecting each shows correct pig label',
-        (tester) async {
-      await _pumpDetails(tester, result: _makeResult(count: 2));
+      'when two pigs exist then selecting each shows correct pig label',
+      (tester) async {
+        await _pumpDetails(tester, result: _makeResult(count: 2));
 
-      // Initially shows count
-      expect(find.textContaining('ตรวจพบหมู: 2 ตัว'), findsOneWidget);
+        // Initially shows count
+        expect(find.textContaining('ตรวจพบหมู: 2 ตัว'), findsOneWidget);
 
-      // Select pig 1
-      await _selectPig(tester, 0);
-      expect(find.textContaining('หมูตัวที่ 1'), findsOneWidget);
-      expect(find.textContaining('หมูตัวที่ 2'), findsNothing);
+        // Select pig 1
+        await _selectPig(tester, 0);
+        expect(find.textContaining('หมูตัวที่ 1'), findsOneWidget);
+        expect(find.textContaining('หมูตัวที่ 2'), findsNothing);
 
-      // Reset
-      await tester.tap(find.text('เลือกตัวอื่น'));
-      await tester.pump();
-      expect(find.textContaining('ตรวจพบหมู: 2 ตัว'), findsOneWidget);
+        // Reset
+        await tester.tap(find.text('เลือกตัวอื่น'));
+        await tester.pump();
+        expect(find.textContaining('ตรวจพบหมู: 2 ตัว'), findsOneWidget);
 
-      // Select pig 2
-      await _selectPig(tester, 1);
-      expect(find.textContaining('หมูตัวที่ 2'), findsOneWidget);
-      expect(find.textContaining('หมูตัวที่ 1'), findsNothing);
-    });
+        // Select pig 2
+        await _selectPig(tester, 1);
+        expect(find.textContaining('หมูตัวที่ 2'), findsOneWidget);
+        expect(find.textContaining('หมูตัวที่ 1'), findsNothing);
+      },
+    );
 
     testWidgets(
-        'when pig selected with distance then reset then weight panel is gone',
-        (tester) async {
-      await _pumpDetails(tester);
-      await _selectPig(tester, 0);
-      await _calculate(tester, '1.0');
+      'when pig selected with distance then reset then weight panel is gone',
+      (tester) async {
+        await _pumpDetails(tester);
+        await _selectPig(tester, 0);
+        await _calculate(tester, '1.0');
 
-      // Weight is visible
-      expect(_weightText(tester), isNotNull);
+        // Weight is visible
+        expect(_weightText(tester), isNotNull);
 
-      // Reset clears selection → weight panel gone
-      await tester.tap(find.text('เลือกตัวอื่น'));
-      await tester.pump();
+        // Reset clears selection → weight panel gone
+        await tester.tap(find.text('เลือกตัวอื่น'));
+        await tester.pump();
 
-      expect(find.textContaining('น้ำหนัก:'), findsNothing);
-    });
+        expect(find.textContaining('น้ำหนัก:'), findsNothing);
+      },
+    );
 
-    testWidgets('when three pigs detected then count label shows 3',
-        (tester) async {
+    testWidgets('when three pigs detected then count label shows 3', (
+      tester,
+    ) async {
       await _pumpDetails(tester, result: _makeResult(count: 3));
 
       expect(find.textContaining('ตรวจพบหมู: 3 ตัว'), findsOneWidget);

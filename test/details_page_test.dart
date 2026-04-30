@@ -16,8 +16,10 @@ void main() {
   });
 
   group('test details page ui', () {
-    Future<void> setupPage(WidgetTester tester,
-        {DetectionResult? result}) async {
+    Future<void> setupPage(
+      WidgetTester tester, {
+      DetectionResult? result,
+    }) async {
       tester.view.physicalSize = const Size(1000, 2000);
       tester.view.devicePixelRatio = 1.0;
       addTearDown(tester.view.resetPhysicalSize);
@@ -31,7 +33,8 @@ void main() {
         imageHeight: 1000,
       );
 
-      final detectionResult = result ??
+      final detectionResult =
+          result ??
           DetectionResult(
             imageWidth: 1000,
             imageHeight: 1000,
@@ -59,24 +62,30 @@ void main() {
       await tester.pump();
     }
 
-    testWidgets('where page loads then it displays basic info',
-        (WidgetTester tester) async {
+    testWidgets('where page loads then it displays basic info', (
+      WidgetTester tester,
+    ) async {
       await setupPage(tester);
       expect(find.text('รายละเอียด'), findsOneWidget);
       expect(find.textContaining('ตรวจพบหมู'), findsWidgets);
     });
 
-    testWidgets('where no pigs are detected then it shows empty state',
-        (WidgetTester tester) async {
-      final emptyResult =
-          DetectionResult(imageWidth: 1000, imageHeight: 1000, detections: []);
+    testWidgets('where no pigs are detected then it shows empty state', (
+      WidgetTester tester,
+    ) async {
+      final emptyResult = DetectionResult(
+        imageWidth: 1000,
+        imageHeight: 1000,
+        detections: [],
+      );
       await setupPage(tester, result: emptyResult);
 
       expect(find.textContaining('ไม่พบ'), findsWidgets);
     });
 
-    testWidgets('where title is long pressed then debug mode toggles',
-        (WidgetTester tester) async {
+    testWidgets('where title is long pressed then debug mode toggles', (
+      WidgetTester tester,
+    ) async {
       await setupPage(tester);
       final initialDebugMode = AppConfig.debugMode;
 
@@ -97,48 +106,55 @@ void main() {
       expect(AppConfig.debugMode, initialDebugMode);
     });
 
-    testWidgets('where a pig is selected then it shows details and allow reset',
-        (WidgetTester tester) async {
-      await setupPage(tester);
+    testWidgets(
+      'where a pig is selected then it shows details and allow reset',
+      (WidgetTester tester) async {
+        await setupPage(tester);
 
-      final overlay =
-          tester.widget<PigImageWithOverlay>(find.byType(PigImageWithOverlay));
-      overlay.onPigSelected?.call(0);
-      await tester.pump();
-      await tester.pump(const Duration(milliseconds: 500));
+        final overlay = tester.widget<PigImageWithOverlay>(
+          find.byType(PigImageWithOverlay),
+        );
+        overlay.onPigSelected?.call(0);
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 500));
 
-      expect(find.textContaining('หมูตัวที่ 1'), findsOneWidget);
+        expect(find.textContaining('หมูตัวที่ 1'), findsOneWidget);
 
-      final resetButton = find.text('เลือกตัวอื่น');
-      await tester.tap(resetButton);
-      await tester.pump();
-      await tester.pump(const Duration(milliseconds: 500));
+        final resetButton = find.text('เลือกตัวอื่น');
+        await tester.tap(resetButton);
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 500));
 
-      expect(find.textContaining('ตรวจพบหมู: 1 ตัว'), findsOneWidget);
-    });
+        expect(find.textContaining('ตรวจพบหมู: 1 ตัว'), findsOneWidget);
+      },
+    );
 
-    testWidgets('where multiple pigs exist then it can select different pigs',
-        (WidgetTester tester) async {
+    testWidgets('where multiple pigs exist then it can select different pigs', (
+      WidgetTester tester,
+    ) async {
       final multipleResult = DetectionResult(
         imageWidth: 1000,
         imageHeight: 1000,
         detections: [
           PigDetection(
-              boundingBox: const Rect.fromLTWH(0, 0, 100, 100),
-              confidence: 0.9,
-              classId: 0,
-              mask: List.generate(10, (y) => List.generate(10, (x) => 1.0))),
+            boundingBox: const Rect.fromLTWH(0, 0, 100, 100),
+            confidence: 0.9,
+            classId: 0,
+            mask: List.generate(10, (y) => List.generate(10, (x) => 1.0)),
+          ),
           PigDetection(
-              boundingBox: const Rect.fromLTWH(200, 200, 100, 100),
-              confidence: 0.8,
-              classId: 0,
-              mask: List.generate(10, (y) => List.generate(10, (x) => 1.0))),
+            boundingBox: const Rect.fromLTWH(200, 200, 100, 100),
+            confidence: 0.8,
+            classId: 0,
+            mask: List.generate(10, (y) => List.generate(10, (x) => 1.0)),
+          ),
         ],
       );
       await setupPage(tester, result: multipleResult);
 
-      final overlay =
-          tester.widget<PigImageWithOverlay>(find.byType(PigImageWithOverlay));
+      final overlay = tester.widget<PigImageWithOverlay>(
+        find.byType(PigImageWithOverlay),
+      );
       overlay.onPigSelected?.call(1);
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 500));
@@ -146,12 +162,14 @@ void main() {
       expect(find.textContaining('หมูตัวที่ 2'), findsOneWidget);
     });
 
-    testWidgets('where a distance is entered then weight is calculated',
-        (WidgetTester tester) async {
+    testWidgets('where a distance is entered then weight is calculated', (
+      WidgetTester tester,
+    ) async {
       await setupPage(tester);
 
-      final overlay =
-          tester.widget<PigImageWithOverlay>(find.byType(PigImageWithOverlay));
+      final overlay = tester.widget<PigImageWithOverlay>(
+        find.byType(PigImageWithOverlay),
+      );
       overlay.onPigSelected?.call(0);
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 500));
@@ -170,12 +188,14 @@ void main() {
       expect(find.textContaining('น้ำหนัก: -'), findsNothing);
     });
 
-    testWidgets('where invalid distance is entered then it shows error',
-        (WidgetTester tester) async {
+    testWidgets('where invalid distance is entered then it shows error', (
+      WidgetTester tester,
+    ) async {
       await setupPage(tester);
 
-      final overlay =
-          tester.widget<PigImageWithOverlay>(find.byType(PigImageWithOverlay));
+      final overlay = tester.widget<PigImageWithOverlay>(
+        find.byType(PigImageWithOverlay),
+      );
       overlay.onPigSelected?.call(0);
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 500));
@@ -191,52 +211,58 @@ void main() {
     });
 
     testWidgets(
-        'where pig without mask is selected then it triggers loading state',
-        (WidgetTester tester) async {
-      final noMaskResult = DetectionResult(
-        imageWidth: 1000,
-        imageHeight: 1000,
-        detections: [
-          PigDetection(
+      'where pig without mask is selected then it triggers loading state',
+      (WidgetTester tester) async {
+        final noMaskResult = DetectionResult(
+          imageWidth: 1000,
+          imageHeight: 1000,
+          detections: [
+            PigDetection(
               boundingBox: const Rect.fromLTRB(100, 100, 500, 500),
               confidence: 0.9,
-              classId: 0),
-        ],
-      );
-      await setupPage(tester, result: noMaskResult);
+              classId: 0,
+            ),
+          ],
+        );
+        await setupPage(tester, result: noMaskResult);
 
-      final overlay =
-          tester.widget<PigImageWithOverlay>(find.byType(PigImageWithOverlay));
+        final overlay = tester.widget<PigImageWithOverlay>(
+          find.byType(PigImageWithOverlay),
+        );
 
-      // Trigger selection
-      overlay.onPigSelected?.call(0);
+        // Trigger selection
+        overlay.onPigSelected?.call(0);
 
-      // Verify loading indicator is shown
-      await tester.pump();
-      expect(find.text('กำลังวิเคราะห์ส่วนต่าง ๆ...'), findsOneWidget);
+        // Verify loading indicator is shown
+        await tester.pump();
+        expect(find.text('กำลังวิเคราะห์ส่วนต่าง ๆ...'), findsOneWidget);
 
-      // Target the CircularProgressIndicator that is a sibling of the loading text
-      expect(
+        // Target the CircularProgressIndicator that is a sibling of the loading text
+        expect(
           find.descendant(
             of: find.ancestor(
-                of: find.text('กำลังวิเคราะห์ส่วนต่าง ๆ...'),
-                matching: find.byType(Column)),
+              of: find.text('กำลังวิเคราะห์ส่วนต่าง ๆ...'),
+              matching: find.byType(Column),
+            ),
             matching: find.byType(CircularProgressIndicator),
           ),
-          findsOneWidget);
+          findsOneWidget,
+        );
 
-      // Wait for bypass mock processing to finish (it uses Future.delayed(50ms) + service call)
-      // Since skipInTests is true, service call is immediate.
-      await tester.pump(const Duration(seconds: 1));
-      await tester.pump();
+        // Wait for bypass mock processing to finish (it uses Future.delayed(50ms) + service call)
+        // Since skipInTests is true, service call is immediate.
+        await tester.pump(const Duration(seconds: 1));
+        await tester.pump();
 
-      // Verify loading indicator is gone
-      expect(find.text('กำลังวิเคราะห์ส่วนต่าง ๆ...'), findsNothing);
-      expect(find.textContaining('หมูตัวที่ 1'), findsOneWidget);
-    });
+        // Verify loading indicator is gone
+        expect(find.text('กำลังวิเคราะห์ส่วนต่าง ๆ...'), findsNothing);
+        expect(find.textContaining('หมูตัวที่ 1'), findsOneWidget);
+      },
+    );
 
-    testWidgets('where back button is present then it can be tapped',
-        (WidgetTester tester) async {
+    testWidgets('where back button is present then it can be tapped', (
+      WidgetTester tester,
+    ) async {
       await setupPage(tester);
       final backButton = find.byType(GestureDetector).first;
       expect(backButton, findsOneWidget);

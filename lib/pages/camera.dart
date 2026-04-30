@@ -44,8 +44,9 @@ class _CameraState extends State<CameraPage> {
       });
 
       // 1. Extract camera metadata
-      final metadata =
-          await CameraMetadataExtractor.extractFromImage(xfile.path);
+      final metadata = await CameraMetadataExtractor.extractFromImage(
+        xfile.path,
+      );
 
       // 2. Run YOLOv8 for initial object detection
       final yolo = await YoloDetector.getInstance();
@@ -56,9 +57,9 @@ class _CameraState extends State<CameraPage> {
           _isProcessing = false;
         });
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('ไม่พบหมูในภาพ')),
-          );
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(const SnackBar(content: Text('ไม่พบหมูในภาพ')));
           Navigator.of(context).pop();
         }
         return;
@@ -83,9 +84,9 @@ class _CameraState extends State<CameraPage> {
       );
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error: $e')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Error: $e')));
       Navigator.of(context).pop();
     }
   }
@@ -118,7 +119,7 @@ class _CameraState extends State<CameraPage> {
                 blurRadius: 4,
                 spreadRadius: 1,
                 offset: Offset(0, 2),
-              )
+              ),
             ],
           ),
           child: Stack(

@@ -77,8 +77,11 @@ class YoloDetector {
       final originalWidth = image.width;
       final originalHeight = image.height;
 
-      final resized =
-          img.copyResize(image, width: _inputSize, height: _inputSize);
+      final resized = img.copyResize(
+        image,
+        width: _inputSize,
+        height: _inputSize,
+      );
 
       final channelSize = _inputSize * _inputSize;
       final inputData = Float32List(1 * 3 * channelSize);
@@ -92,16 +95,17 @@ class YoloDetector {
         }
       }
 
-      final inputTensor = OrtValueTensor.createTensorWithDataList(
-        inputData,
-        [1, 3, _inputSize, _inputSize],
-      );
+      final inputTensor = OrtValueTensor.createTensorWithDataList(inputData, [
+        1,
+        3,
+        _inputSize,
+        _inputSize,
+      ]);
 
       final runOptions = OrtRunOptions();
-      final outputs = await _session!.runAsync(
-        runOptions,
-        {'images': inputTensor},
-      );
+      final outputs = await _session!.runAsync(runOptions, {
+        'images': inputTensor,
+      });
 
       if (outputs == null || outputs.isEmpty || outputs[0] == null) {
         inputTensor.release();
@@ -110,8 +114,11 @@ class YoloDetector {
       }
 
       final outputValue = outputs[0]!.value as List<List<List<double>>>;
-      final result =
-          _postprocess(outputValue[0], originalWidth, originalHeight);
+      final result = _postprocess(
+        outputValue[0],
+        originalWidth,
+        originalHeight,
+      );
 
       inputTensor.release();
       runOptions.release();
@@ -127,7 +134,10 @@ class YoloDetector {
   }
 
   List<PigDetection> _postprocess(
-      List<List<double>> output, int imgW, int imgH) {
+    List<List<double>> output,
+    int imgW,
+    int imgH,
+  ) {
     List<PigDetection> candidates = [];
     final int numBoxes = output[0].length;
 
@@ -145,11 +155,9 @@ class YoloDetector {
         imgH: imgH,
       );
 
-      candidates.add(PigDetection(
-        boundingBox: rect,
-        confidence: score,
-        classId: 0,
-      ));
+      candidates.add(
+        PigDetection(boundingBox: rect, confidence: score, classId: 0),
+      );
     }
 
     return _nms(candidates);

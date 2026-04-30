@@ -21,7 +21,7 @@ class Camera extends StatelessWidget {
             blurRadius: 4,
             spreadRadius: 1,
             offset: Offset(0, 2), // Shadow position
-          )
+          ),
         ],
       ),
       child: Stack(
@@ -29,11 +29,7 @@ class Camera extends StatelessWidget {
           Align(
             alignment: Alignment.topCenter,
             child: Column(
-              children: [
-                cameraLogo(context),
-                text(context),
-                button(context),
-              ],
+              children: [cameraLogo(context), text(context), button(context)],
             ),
           ),
           if (isDisabled)
@@ -50,42 +46,44 @@ class Camera extends StatelessWidget {
 
   Padding button(BuildContext context) {
     return Padding(
-        padding: const EdgeInsets.only(top: 8),
-        child: GestureDetector(
-          key: const Key('home_camera_button'),
-          onTap: isDisabled
-              ? null
-              : () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const CameraPage()));
-                },
-          child: Container(
-            width: ResponsiveUtils.width(context, 60),
-            height: ResponsiveUtils.height(context, 7),
-            decoration: BoxDecoration(
-                color: isDisabled ? Colors.grey : Color(0xFF2671F4),
-                borderRadius: BorderRadius.circular(20),
-                boxShadow: [
-                  BoxShadow(
-                    color: Color.fromARGB(25, 0, 0, 0),
-                    blurRadius: 4,
-                    offset: Offset(0, 4), // Shadow position
-                  )
-                ]),
-            child: Center(
-              child: Text(
-                'คลิก',
-                style: TextStyle(
-                  fontSize: ResponsiveUtils.fontSize(context, 24),
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFFFFFFFF),
-                ),
+      padding: const EdgeInsets.only(top: 8),
+      child: GestureDetector(
+        key: const Key('home_camera_button'),
+        onTap: isDisabled
+            ? null
+            : () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const CameraPage()),
+                );
+              },
+        child: Container(
+          width: ResponsiveUtils.width(context, 60),
+          height: ResponsiveUtils.height(context, 7),
+          decoration: BoxDecoration(
+            color: isDisabled ? Colors.grey : Color(0xFF2671F4),
+            borderRadius: BorderRadius.circular(20),
+            boxShadow: [
+              BoxShadow(
+                color: Color.fromARGB(25, 0, 0, 0),
+                blurRadius: 4,
+                offset: Offset(0, 4), // Shadow position
+              ),
+            ],
+          ),
+          child: Center(
+            child: Text(
+              'คลิก',
+              style: TextStyle(
+                fontSize: ResponsiveUtils.fontSize(context, 24),
+                fontWeight: FontWeight.bold,
+                color: Color(0xFFFFFFFF),
               ),
             ),
           ),
-        ));
+        ),
+      ),
+    );
   }
 
   Padding text(BuildContext context) {

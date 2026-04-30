@@ -64,7 +64,8 @@ class PigMeasurements {
         if (mask[y][x] <= 0.5) continue;
 
         // Check if edge pixel
-        bool isEdge = (x == 0 ||
+        bool isEdge =
+            (x == 0 ||
             x == maskW - 1 ||
             y == 0 ||
             y == maskH - 1 ||
@@ -161,11 +162,41 @@ class PigMeasurements {
     final window = length * windowFrac;
 
     final topResult = _localWidthWithEndpoints(
-        pointsX, pointsY, meanX, meanY, ax, ay, bx, by, topProj, window);
+      pointsX,
+      pointsY,
+      meanX,
+      meanY,
+      ax,
+      ay,
+      bx,
+      by,
+      topProj,
+      window,
+    );
     final midResult = _localWidthWithEndpoints(
-        pointsX, pointsY, meanX, meanY, ax, ay, bx, by, midProj, window);
+      pointsX,
+      pointsY,
+      meanX,
+      meanY,
+      ax,
+      ay,
+      bx,
+      by,
+      midProj,
+      window,
+    );
     final botResult = _localWidthWithEndpoints(
-        pointsX, pointsY, meanX, meanY, ax, ay, bx, by, botProj, window);
+      pointsX,
+      pointsY,
+      meanX,
+      meanY,
+      ax,
+      ay,
+      bx,
+      by,
+      botProj,
+      window,
+    );
 
     // Sample points along main axis for width line centers
     final topCenter = Offset(meanX + ax * topProj, meanY + ay * topProj);
@@ -179,18 +210,30 @@ class PigMeasurements {
       widthBottom: botResult.width,
       lengthP1: p1,
       lengthP2: p2,
-      topA: Offset(topCenter.dx + bx * topResult.minPerp,
-          topCenter.dy + by * topResult.minPerp),
-      topB: Offset(topCenter.dx + bx * topResult.maxPerp,
-          topCenter.dy + by * topResult.maxPerp),
-      midA: Offset(midCenter.dx + bx * midResult.minPerp,
-          midCenter.dy + by * midResult.minPerp),
-      midB: Offset(midCenter.dx + bx * midResult.maxPerp,
-          midCenter.dy + by * midResult.maxPerp),
-      botA: Offset(botCenter.dx + bx * botResult.minPerp,
-          botCenter.dy + by * botResult.minPerp),
-      botB: Offset(botCenter.dx + bx * botResult.maxPerp,
-          botCenter.dy + by * botResult.maxPerp),
+      topA: Offset(
+        topCenter.dx + bx * topResult.minPerp,
+        topCenter.dy + by * topResult.minPerp,
+      ),
+      topB: Offset(
+        topCenter.dx + bx * topResult.maxPerp,
+        topCenter.dy + by * topResult.maxPerp,
+      ),
+      midA: Offset(
+        midCenter.dx + bx * midResult.minPerp,
+        midCenter.dy + by * midResult.minPerp,
+      ),
+      midB: Offset(
+        midCenter.dx + bx * midResult.maxPerp,
+        midCenter.dy + by * midResult.maxPerp,
+      ),
+      botA: Offset(
+        botCenter.dx + bx * botResult.minPerp,
+        botCenter.dy + by * botResult.minPerp,
+      ),
+      botB: Offset(
+        botCenter.dx + bx * botResult.maxPerp,
+        botCenter.dy + by * botResult.maxPerp,
+      ),
     );
   }
 

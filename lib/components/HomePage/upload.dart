@@ -39,8 +39,9 @@ class _UploadState extends State<Upload> {
 
       try {
         // Extract camera metadata from the uploaded image
-        final metadata =
-            await CameraMetadataExtractor.extractFromImage(xfile.path);
+        final metadata = await CameraMetadataExtractor.extractFromImage(
+          xfile.path,
+        );
 
         // Run YOLO pig detection inference
         final detector = await YoloDetector.getInstance();
@@ -73,9 +74,9 @@ class _UploadState extends State<Upload> {
         debugPrint(stack.toString());
         if (mounted) {
           _setProcessing(false);
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('เกิดข้อผิดพลาด: $e')),
-          );
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text('เกิดข้อผิดพลาด: $e')));
         }
       }
     }
@@ -95,7 +96,7 @@ class _UploadState extends State<Upload> {
             blurRadius: 4,
             spreadRadius: 1,
             offset: Offset(0, 2),
-          )
+          ),
         ],
       ),
       child: Stack(
@@ -149,38 +150,41 @@ class _UploadState extends State<Upload> {
 
   Padding button(BuildContext context) {
     return Padding(
-        padding: const EdgeInsets.only(top: 8),
-        child: GestureDetector(
-          key: const Key('home_upload_button'),
-          onTap: _isProcessing ? null : _handleUpload,
-          child: Container(
-            width: ResponsiveUtils.width(context, 60),
-            height: ResponsiveUtils.height(context, 7),
-            decoration: BoxDecoration(
-                color: Color(0xFFFFFFFF),
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(
-                    color: _isProcessing ? Colors.grey : Color(0xFF2671F4),
-                    width: 2),
-                boxShadow: [
-                  BoxShadow(
-                    color: Color.fromARGB(25, 0, 0, 0),
-                    blurRadius: 4,
-                    offset: Offset(0, 4),
-                  )
-                ]),
-            child: Center(
-              child: Text(
-                'คลิก',
-                style: TextStyle(
-                  fontSize: ResponsiveUtils.fontSize(context, 24),
-                  fontWeight: FontWeight.bold,
-                  color: _isProcessing ? Colors.grey : Color(0xFF2671F4),
-                ),
+      padding: const EdgeInsets.only(top: 8),
+      child: GestureDetector(
+        key: const Key('home_upload_button'),
+        onTap: _isProcessing ? null : _handleUpload,
+        child: Container(
+          width: ResponsiveUtils.width(context, 60),
+          height: ResponsiveUtils.height(context, 7),
+          decoration: BoxDecoration(
+            color: Color(0xFFFFFFFF),
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(
+              color: _isProcessing ? Colors.grey : Color(0xFF2671F4),
+              width: 2,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Color.fromARGB(25, 0, 0, 0),
+                blurRadius: 4,
+                offset: Offset(0, 4),
+              ),
+            ],
+          ),
+          child: Center(
+            child: Text(
+              'คลิก',
+              style: TextStyle(
+                fontSize: ResponsiveUtils.fontSize(context, 24),
+                fontWeight: FontWeight.bold,
+                color: _isProcessing ? Colors.grey : Color(0xFF2671F4),
               ),
             ),
           ),
-        ));
+        ),
+      ),
+    );
   }
 
   Padding text(BuildContext context) {

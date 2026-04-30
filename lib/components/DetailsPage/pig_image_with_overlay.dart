@@ -131,54 +131,54 @@ class _PigImageWithOverlayState extends State<PigImageWithOverlay> {
               child: const Center(child: CircularProgressIndicator()),
             )
           : _aspectRatio != null
-              ? ClipRRect(
-                  borderRadius: BorderRadius.circular(12),
-                  child: AspectRatio(
-                    aspectRatio: _aspectRatio!,
-                    child: LayoutBuilder(
-                      builder: (context, constraints) {
-                        return GestureDetector(
-                          onTapUp: (details) => _onTapUp(details, constraints),
-                          child: Stack(
-                            fit: StackFit.expand,
-                            children: [
-                              // Base image
-                              Image.file(
-                                File(widget.imagePath!),
-                                fit: BoxFit.cover,
-                                width: constraints.maxWidth,
-                              ),
-                              // Detection overlay
-                              if (widget.detectionResult != null &&
-                                  !widget.detectionResult!.isEmpty)
-                                CustomPaint(
-                                  size: Size(
-                                    constraints.maxWidth,
-                                    constraints.maxWidth / _aspectRatio!,
-                                  ),
-                                  painter: DetectionOverlayPainter(
-                                    detectionResult: widget.detectionResult!,
-                                    displayWidth: constraints.maxWidth,
-                                    displayHeight:
-                                        constraints.maxWidth / _aspectRatio!,
-                                    selectedIndex: widget.selectedPigIndex,
-                                  ),
-                                ),
-                            ],
+          ? ClipRRect(
+              borderRadius: BorderRadius.circular(12),
+              child: AspectRatio(
+                aspectRatio: _aspectRatio!,
+                child: LayoutBuilder(
+                  builder: (context, constraints) {
+                    return GestureDetector(
+                      onTapUp: (details) => _onTapUp(details, constraints),
+                      child: Stack(
+                        fit: StackFit.expand,
+                        children: [
+                          // Base image
+                          Image.file(
+                            File(widget.imagePath!),
+                            fit: BoxFit.cover,
+                            width: constraints.maxWidth,
                           ),
-                        );
-                      },
-                    ),
-                  ),
-                )
-              : Container(
-                  width: ResponsiveUtils.width(context, 90),
-                  height: ResponsiveUtils.height(context, 32),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFD9D9D9),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
+                          // Detection overlay
+                          if (widget.detectionResult != null &&
+                              !widget.detectionResult!.isEmpty)
+                            CustomPaint(
+                              size: Size(
+                                constraints.maxWidth,
+                                constraints.maxWidth / _aspectRatio!,
+                              ),
+                              painter: DetectionOverlayPainter(
+                                detectionResult: widget.detectionResult!,
+                                displayWidth: constraints.maxWidth,
+                                displayHeight:
+                                    constraints.maxWidth / _aspectRatio!,
+                                selectedIndex: widget.selectedPigIndex,
+                              ),
+                            ),
+                        ],
+                      ),
+                    );
+                  },
                 ),
+              ),
+            )
+          : Container(
+              width: ResponsiveUtils.width(context, 90),
+              height: ResponsiveUtils.height(context, 32),
+              decoration: BoxDecoration(
+                color: const Color(0xFFD9D9D9),
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
     );
   }
 }
@@ -315,7 +315,8 @@ class DetectionOverlayPainter extends CustomPainter {
     final maskW = mask[0].length;
 
     // Use maskRect if available, otherwise assume full image
-    final Rect drawArea = det.maskRect ??
+    final Rect drawArea =
+        det.maskRect ??
         Rect.fromLTWH(0, 0, displayWidth / scaleX, displayHeight / scaleY);
 
     final double scaledMaskLeft = drawArea.left * scaleX;
@@ -394,14 +395,34 @@ class DetectionOverlayPainter extends CustomPainter {
     canvas.drawLine(scale(pca.botA), scale(pca.botB), hipPaint);
 
     // Draw labels at endpoints to avoid overlap
-    _drawLineLabel(canvas, scale(pca.lengthP2), 'Length',
-        const Color(0xFFFF0000), const Offset(5, -5));
-    _drawLineLabel(canvas, scale(pca.topA), 'Chest', const Color(0xFF0000FF),
-        const Offset(-50, -5));
-    _drawLineLabel(canvas, scale(pca.midA), 'Abdominal',
-        const Color(0xFFFFFF00), const Offset(-65, -5));
-    _drawLineLabel(canvas, scale(pca.botA), 'Hip', const Color(0xFFFF8800),
-        const Offset(-35, -5));
+    _drawLineLabel(
+      canvas,
+      scale(pca.lengthP2),
+      'Length',
+      const Color(0xFFFF0000),
+      const Offset(5, -5),
+    );
+    _drawLineLabel(
+      canvas,
+      scale(pca.topA),
+      'Chest',
+      const Color(0xFF0000FF),
+      const Offset(-50, -5),
+    );
+    _drawLineLabel(
+      canvas,
+      scale(pca.midA),
+      'Abdominal',
+      const Color(0xFFFFFF00),
+      const Offset(-65, -5),
+    );
+    _drawLineLabel(
+      canvas,
+      scale(pca.botA),
+      'Hip',
+      const Color(0xFFFF8800),
+      const Offset(-35, -5),
+    );
   }
 
   void _drawLineLabel(

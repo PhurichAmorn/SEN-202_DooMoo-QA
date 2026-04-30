@@ -89,10 +89,9 @@ class PigDetector {
       );
 
       final runOptions = OrtRunOptions();
-      final outputs = await _session!.runAsync(
-        runOptions,
-        {_inputName: inputTensor},
-      );
+      final outputs = await _session!.runAsync(runOptions, {
+        _inputName: inputTensor,
+      });
 
       final outputList = outputs ?? [];
       final detections = _postprocess(outputList, preprocessed);
@@ -110,11 +109,7 @@ class PigDetector {
       );
     } catch (e) {
       debugPrint('Segmentation inference failed: $e');
-      return DetectionResult(
-        detections: [],
-        imageWidth: 0,
-        imageHeight: 0,
-      );
+      return DetectionResult(detections: [], imageWidth: 0, imageHeight: 0);
     }
   }
 
@@ -156,9 +151,11 @@ class PigDetector {
     final double scaleToCurrentX = currentWidth / inputSize;
     final double scaleToCurrentY = currentHeight / inputSize;
 
-    for (int i = 0;
-        i < numDetections && detections.length < _maxDetections;
-        i++) {
+    for (
+      int i = 0;
+      i < numDetections && detections.length < _maxDetections;
+      i++
+    ) {
       final score = scores[i];
       if (score < _confidenceThreshold) continue;
 
@@ -185,15 +182,22 @@ class PigDetector {
         mask = _parseMask(masksRaw, i, preprocessed);
       }
 
-      detections.add(PigDetection(
-        boundingBox: Rect.fromLTRB(left, top, right, bottom),
-        confidence: score,
-        classId: 0,
-        mask: mask,
-        maskRect: cropRect ??
-            Rect.fromLTRB(
-                0, 0, originalWidth.toDouble(), originalHeight.toDouble()),
-      ));
+      detections.add(
+        PigDetection(
+          boundingBox: Rect.fromLTRB(left, top, right, bottom),
+          confidence: score,
+          classId: 0,
+          mask: mask,
+          maskRect:
+              cropRect ??
+              Rect.fromLTRB(
+                0,
+                0,
+                originalWidth.toDouble(),
+                originalHeight.toDouble(),
+              ),
+        ),
+      );
     }
 
     detections.sort((a, b) => b.confidence.compareTo(a.confidence));
